@@ -30,7 +30,10 @@ Implemented (Phase 3, Task 1):
 Implemented (Phase 3, Task 2):
 - Deterministic candidate relevance (`CandidateRelevanceEvaluator`, `TechnicalErrorCodes`, `ReportedVersionAssessor`): each candidate bug gets a `relevance` object (tier, exact error-code match, tentative version-range check, supporting and limitation notes), and candidates are re-ordered by tier, version, confirmed count, then id. Candidates are never promoted or dropped. `ticket-candidates.cypher` now also returns the bug `description`.
 
-Not implemented yet: further investigation APIs, LLM integration, real UI.
+Implemented (Phase 4, Task 1):
+- Evidence context builder in `apps/api/ResolveNest.Api/Features/EvidenceContext/`. `EvidenceContextBuilder.Build(TicketInvestigationResponse, EvidenceContextLimits?)` is pure: no Neo4j, no LLM, no endpoint. It produces a bounded, typed `InvestigationEvidenceContext`. Source text appears only as verbatim `SourceExcerpt`s under a character budget, selection is deterministic, limitations are explicit, omissions are reported, and a deduplicated citation catalog uses content-derived `rec:<id>` / `rel:<from>><TYPE>><to>` IDs. See `docs/ai-evidence-context.md`.
+
+Not implemented yet: LLM integration, AI answers and citation validation, reply drafting, further investigation APIs, real UI.
 
 Known issues (leave alone unless asked):
 - `README.md` is UTF-16 LE encoded.
