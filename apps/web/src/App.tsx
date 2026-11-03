@@ -1,26 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { AppShell } from '@/components/layout/AppShell'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { DEFAULT_TICKET_ID, DEMO_TICKETS } from '@/features/investigations/demoTickets'
+import { InvestigationWorkspace } from '@/features/investigations/InvestigationWorkspace'
 
 function App() {
-  const [apiStatus, setApiStatus] = useState('Checking...')
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('API request failed')
-        }
-        return response.json()
-      })
-      .then((data) => setApiStatus(data.status))
-      .catch(() => setApiStatus('Unavailable'))
-  }, [])
+  const [selectedTicketId, setSelectedTicketId] = useState(DEFAULT_TICKET_ID)
+  const selectedScenario = DEMO_TICKETS.find((ticket) => ticket.ticketId === selectedTicketId)
 
   return (
-    <main>
-      <h1>ResolveNest</h1>
-      <p>AI-Powered SaaS Technical Support Investigator</p>
-      <p>Backend status: {apiStatus}</p>
-    </main>
+    <TooltipProvider delayDuration={200}>
+      <AppShell selectedTicketId={selectedTicketId} onSelectTicket={setSelectedTicketId}>
+        <InvestigationWorkspace
+          ticketId={selectedTicketId}
+          scenarioLabel={selectedScenario?.label ?? null}
+        />
+      </AppShell>
+    </TooltipProvider>
   )
 }
 
