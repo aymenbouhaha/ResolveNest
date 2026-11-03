@@ -16,6 +16,7 @@ RETURN
       id: bug.id,
       type: 'Bug',
       title: bug.title,
+      description: bug.description,
       sourceStatus: bug.status,
       severity: bug.severity,
       workaround: bug.workaround,

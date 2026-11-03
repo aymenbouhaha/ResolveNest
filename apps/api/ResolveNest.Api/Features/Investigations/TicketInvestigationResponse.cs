@@ -128,6 +128,7 @@ public sealed record CandidateBug(
     string Id,
     string Type,
     string? Title,
+    string? Description,
     string? SourceStatus,
     string? Severity,
     string? Workaround,
@@ -144,7 +145,8 @@ public sealed record CandidateBug(
     long ConfirmedCustomerCount,
     IReadOnlyList<CandidateConfirmedTicket> ConfirmedTickets,
     int ConfirmedTicketLimit,
-    bool ConfirmedTicketsTruncated);
+    bool ConfirmedTicketsTruncated,
+    CandidateRelevance Relevance);
 
 public sealed record RelatedTicket(
     string Id,

@@ -27,6 +27,9 @@ Implemented (Phase 2):
 Implemented (Phase 3, Task 1):
 - `GET /api/investigations/tickets/{ticketId}?includeContent=false` in `apps/api/ResolveNest.Api/Features/Investigations/`. Runs ticket-evidence, ticket-candidates and ticket-knowledge (embedded resources from `db/neo4j/queries/`) in one read transaction and maps them to typed DTOs. 400 for a non-canonical ID, 404 unknown, 503 database failure. See `docs/investigation-api.md`. `entity-knowledge.cypher` is not exposed.
 
+Implemented (Phase 3, Task 2):
+- Deterministic candidate relevance (`CandidateRelevanceEvaluator`, `TechnicalErrorCodes`, `ReportedVersionAssessor`): each candidate bug gets a `relevance` object (tier, exact error-code match, tentative version-range check, supporting and limitation notes), and candidates are re-ordered by tier, version, confirmed count, then id. Candidates are never promoted or dropped. `ticket-candidates.cypher` now also returns the bug `description`.
+
 Not implemented yet: further investigation APIs, LLM integration, real UI.
 
 Known issues (leave alone unless asked):

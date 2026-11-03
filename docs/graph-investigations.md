@@ -35,12 +35,13 @@ Returns `requestedTicketId`, `found`, `candidateBugs[]` (at most 25), `relatedTi
 
 - **`candidateBugs[]`:** bugs that `AFFECT` a feature the ticket is `ABOUT`, excluding bugs already confirmed for this ticket (those are in A). Each item has:
   - `evidence: 'candidate'` and a `reason`
+  - the bug's `title` and `description` (the description is the source text the API uses to extract error codes; see [investigation-api.md](investigation-api.md#candidate-relevance))
   - `sharedFeatures[]`: which feature caused it to appear, with the AFFECTS provenance
   - documented `introducedIn[]` / `fixedIn[]`
   - `confirmedTicketCount` and `confirmedCustomerCount`: other tickets with `CONFIRMED_AS` to that bug, and their customers
   - `confirmedTickets[]`: at most 25, ordered by ticket id, each `evidence: 'confirmed'` with `customerId`, `sameCustomer`, `reportedVersion`, `confirmedBy` and `confirmedAt`
 
-  Candidates are ordered by `confirmedTicketCount` descending, then `id`. **This is a factual count used for ordering, not a relevance or confidence score.**
+  Candidates are ordered by `confirmedTicketCount` descending, then `id`, and the `LIMIT 25` applies in that order. **This is a factual count used for ordering, not a relevance or confidence score.** The API re-orders the returned candidates by its deterministic relevance rules.
 - **`relatedTickets[]`:** other tickets about a shared feature, newest first. Each item has:
   - `evidence: 'context'`
   - `sharedFeatureIds`
@@ -150,7 +151,7 @@ docker compose exec -T neo4j sh -c 'cypher-shell -u neo4j -p "${NEO4J_AUTH#neo4j
 docker compose exec -T neo4j sh -c 'cypher-shell -u neo4j -p "${NEO4J_AUTH#neo4j/}" --access-mode read -P "{bugIds: ['"'"'bug:BUG-231'"'"'], featureIds: [], includeContent: false}"' < db/neo4j/queries/entity-knowledge.cypher
 ```
 
-`--access-mode read` makes Neo4j reject any write. The local test project `tests/ResolveNest.Graph.InvestigationTests/` runs every query file inside read transactions (`ExecuteReadAsync`). It is excluded through `.git/info/exclude` and not part of `ResolveNest.slnx`:
+The queries are read-only by construction: they contain no write clauses, which a local test checks. `--access-mode read` adds a guard: on this single-instance setup Neo4j refuses write clauses in a read transaction. It is not an access-control mechanism, and the Neo4j driver documentation warns against relying on it as one. The local test project `tests/ResolveNest.Graph.InvestigationTests/` runs every query file inside read transactions (`ExecuteReadAsync`). It is excluded through `.git/info/exclude` and not part of `ResolveNest.slnx`:
 
 ```bash
 dotnet test tests/ResolveNest.Graph.InvestigationTests

@@ -11,7 +11,8 @@ public static class TicketInvestigationMapper
         var ticket = MapTicket(evidenceRow.OptionalMap("ticket") ?? throw new InvestigationResultException("Investigation result has a found ticket without ticket data."));
         var features = evidenceRow.List("features", MapFeature);
         var confirmedBugs = evidenceRow.List("confirmedBugs", MapConfirmedBug);
-        var candidateBugs = candidatesRow.List("candidateBugs", MapCandidateBug);
+        var relevanceContext = CandidateRelevanceEvaluator.CreateContext(ticket, confirmedBugs);
+        var candidateBugs = CandidateRelevanceEvaluator.Order(candidatesRow.List("candidateBugs", map => MapCandidateBug(map, relevanceContext)));
         var relatedTickets = candidatesRow.List("relatedTickets", MapRelatedTicket);
         var relatedTicketTotal = candidatesRow.RequiredLong("relatedTicketCount");
         var knowledgeArticles = knowledgeRow.List("articles", MapKnowledgeArticle);
@@ -136,31 +137,42 @@ public static class TicketInvestigationMapper
         map.OptionalString("sourceRecord"),
         map.OptionalString("relationshipSourceRecord"));
 
-    private static CandidateBug MapCandidateBug(GraphResultMap map)
+    private static CandidateBug MapCandidateBug(GraphResultMap map, TicketRelevanceContext relevanceContext)
     {
+        var title = map.OptionalString("title");
+        var description = map.OptionalString("description");
+        var sharedFeatures = map.List("sharedFeatures", MapSharedFeature);
+        var introducedIn = map.List("introducedIn", MapRelease);
+        var fixedIn = map.List("fixedIn", MapRelease);
         var confirmedTicketCount = map.RequiredLong("confirmedTicketCount");
+        var confirmedCustomerCount = map.RequiredLong("confirmedCustomerCount");
         var confirmedTickets = map.List("confirmedTickets", MapCandidateConfirmedTicket);
+        var relevance = CandidateRelevanceEvaluator.Evaluate(
+            relevanceContext, title, description, sharedFeatures, introducedIn, fixedIn, confirmedTicketCount, confirmedCustomerCount);
+
         return new CandidateBug(
             map.RequiredString("id"),
             map.RequiredString("type"),
-            map.OptionalString("title"),
+            title,
+            description,
             map.OptionalString("sourceStatus"),
             map.OptionalString("severity"),
             map.OptionalString("workaround"),
             map.RequiredEvidence("evidence"),
             map.RequiredString("path"),
             map.RequiredString("reason"),
-            map.List("sharedFeatures", MapSharedFeature),
+            sharedFeatures,
             map.OptionalString("sourceSystem"),
             map.OptionalString("sourceId"),
             map.OptionalString("sourceRecord"),
-            map.List("introducedIn", MapRelease),
-            map.List("fixedIn", MapRelease),
+            introducedIn,
+            fixedIn,
             confirmedTicketCount,
-            map.RequiredLong("confirmedCustomerCount"),
+            confirmedCustomerCount,
             confirmedTickets,
             InvestigationQueryLimits.ConfirmedTicketsPerCandidate,
-            confirmedTicketCount > confirmedTickets.Count);
+            confirmedTicketCount > confirmedTickets.Count,
+            relevance);
     }
 
     private static RelatedTicket MapRelatedTicket(GraphResultMap map) => new(
