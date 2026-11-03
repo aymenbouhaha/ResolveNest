@@ -1,5 +1,6 @@
 import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { AskResolveNestSection } from './components/answer/AskResolveNestSection'
 import { CandidateBugsSection } from './components/CandidateBugsSection'
 import { ConfirmedBugsSection } from './components/ConfirmedBugsSection'
 import { InvestigationErrorState, InvestigationSkeleton } from './components/InvestigationStates'
@@ -55,6 +56,7 @@ function InvestigationResult({ investigation }: { investigation: TicketInvestiga
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
       <div className="min-w-0 space-y-8">
         <TicketOverview investigation={investigation} />
+        <AskResolveNestSection key={investigation.ticket.id} investigation={investigation} />
         <div className="xl:hidden">
           <InvestigationSummary investigation={investigation} />
         </div>

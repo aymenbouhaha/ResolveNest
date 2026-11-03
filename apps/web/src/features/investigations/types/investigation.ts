@@ -255,4 +255,6 @@ export interface ProblemDetails {
   status?: number
   detail?: string
   errors?: Record<string, string[]>
+  reason?: string
+  validationFailures?: string[]
 }

@@ -21,14 +21,14 @@ export interface InvestigationError {
   technicalDetail?: string
 }
 
-const TIMEOUT_ERROR_CODES = new Set(['ECONNABORTED', 'ETIMEDOUT'])
+export const TIMEOUT_ERROR_CODES = new Set(['ECONNABORTED', 'ETIMEDOUT'])
 const PROXY_FAILURE_STATUSES = new Set([502, 504])
 
 export function isRequestCancelled(error: unknown): boolean {
   return axios.isCancel(error) || (axios.isAxiosError(error) && error.code === 'ERR_CANCELED')
 }
 
-function readProblemDetails(data: unknown): ProblemDetails | null {
+export function readProblemDetails(data: unknown): ProblemDetails | null {
   if (typeof data !== 'object' || data === null) {
     return null
   }

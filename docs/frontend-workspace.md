@@ -1,6 +1,6 @@
 # Investigation Workspace (frontend)
 
-Phase 5, Task 1. A read-only React workspace over `GET /api/investigations/tickets/{ticketId}` (see [investigation-api.md](investigation-api.md)). It has no AI question answering, no reply drafting and no writes.
+Phase 5, Tasks 1 and 2. A React workspace over `GET /api/investigations/tickets/{ticketId}` (see [investigation-api.md](investigation-api.md)) with an "Ask ResolveNest" panel over `POST …/ask` (see [gemini-integration.md](gemini-integration.md) and [Ask ResolveNest](#ask-resolvenest-task-2)). It has no reply drafting and no writes.
 
 Code: `apps/web/src/`.
 
@@ -133,9 +133,81 @@ Run: `npm run build` and `npm run lint` (both clean); manual testing in the desk
 
 Not verified: timeout and 503 paths in the browser, screen-reader output, and request abortion as observed in the network log (local responses were too fast to show cancelled entries; stale protection was checked through the rendered result).
 
+## Ask ResolveNest (Task 2)
+
+A panel directly under the ticket overview sends one question about the selected ticket to `POST /api/investigations/tickets/{ticketId}/ask` and shows one structured answer. It never calls the AI provider from the browser, holds no provider configuration, keeps no history and stores nothing.
+
+### Code
+
+| File | Responsibility |
+|---|---|
+| `types/investigationAnswer.ts` | Mirror of `AiInvestigationAnswer`, `AiFinding`, `AiStatement`, `CitationSource`, `CitedRelationship`, `AiAnswerProvenance`, `AskInvestigationRequest` |
+| `api/investigationAskApi.ts` | `askInvestigationQuestion(ticketId, question, { signal })`: shared Axios client, encoded ticket ID, `{ question }` body, 75 s timeout (server: 45 s provider timeout, 60 s HTTP client) |
+| `api/investigationAnswerGuard.ts` | Light shape check: known `status`, string `answer`, three statement lists with `citationIds`, `validatedSources` with `citationId`, and `ticketId` equal to the requested ticket |
+| `api/investigationAskErrors.ts` | Maps Problem Details (`reason` extension first, then status) to product messages |
+| `lib/questionRules.ts` | Client copy of the server's question rules: trimmed 5–1,000 characters, no control characters except tab, newline and carriage return |
+| `hooks/useInvestigationAsk.ts` | `idle → asking → answered | failed`, one `AbortController` per request |
+| `lib/citationLabels.ts` | Readable labels for cited records and connections; finding-kind labels |
+| `lib/answerTextFormatting.ts` | Display-only replacement of prefixed IDs in AI text (`bug:BUG-231` → `BUG-231`, `customer:acme` → `Acme Corporation`) |
+| `components/answer/*` | Form, loading, error and answer presentation |
+
+### Request lifecycle
+
+- Nothing is sent when a ticket loads or when an example question is clicked; examples only fill the field.
+- Submit (button or Ctrl/Cmd+Enter) is disabled for invalid input and while a request is active. A second submit during a request is ignored by both the disabled button and a ref guard in the hook.
+- While asking, the previous answer is replaced by a placeholder that repeats the question, and the field and examples are disabled. "Cancel" aborts the request and returns to idle.
+- Ticket switch: the panel is keyed by ticket ID and also unmounts while the next investigation loads. Unmounting aborts the request, and a result is only applied if its controller was not aborted, so a late answer cannot appear on another ticket. The question field resets with the ticket.
+- No automatic retry. Retryable errors offer "Please try again", which re-sends the same question once per click.
+
+### Error mapping
+
+| Server response | Shown as | Retry button |
+|---|---|---|
+| 400 validation | The question could not be sent | no |
+| 404 | Ticket not found | no |
+| 503 without `reason` (database) | Unable to complete the investigation, ticket information unavailable | yes |
+| 503 `aiNotConfigured`, 502 `aiAuthenticationFailed`, 502 `aiModelUnavailable` | AI investigation is not available | no |
+| 429 `aiRateLimited` | AI request limit reached. No reset time is shown, even when `Retry-After` is present | yes |
+| 504 `aiTimeout`, or the 75 s client timeout | The AI investigation took too long | yes |
+| 422 `aiResponseBlocked` | No answer could be produced; rephrase | no |
+| 502 `answerRejected` | The answer did not pass evidence checks | yes |
+| other 502 `ai*` | The AI investigation is temporarily unavailable. Your existing ticket information is still accessible. | yes |
+| 5xx without Problem Details (Vite proxy, API down) or no response | ResolveNest could not reach the investigation service | yes |
+| 500 / `evidenceTooLarge` / unexpected shape | Unable to complete the investigation / display the answer | yes |
+
+The status, `reason`, title, validation errors and `validationFailures` codes are listed under the collapsed "Technical details" item. Provider error bodies are never returned by the server, so none can be shown.
+
+### Answer presentation
+
+- Header: "Investigation answer", an "AI-generated" badge, and "Not enough evidence" when `status` is `insufficientEvidence`, followed by a one-line explanation. A 200 response is never presented as conclusive by itself.
+- The answer text is split into paragraphs and rendered as React text nodes; no Markdown or HTML rendering.
+- Key findings show the finding kind as a badge: Confirmed for this ticket, Confirmed on other cases, Possible, Documented, Background, Conflicting evidence. Uncertainties and suggested next steps ("Suggestions only. Nothing is done automatically.") follow. Each section appears only when the list is non-empty.
+- Every statement shows the records it cites as chips, resolved through `validatedSources`. Unknown citation IDs are skipped, never invented.
+- "Supporting records" lists cited records ("Product issue BUG-231", "Release 2.3.2", "Troubleshooting guide KB-012") and cited connections ("BUG-231 fixed in version 2.3.2") with their evidence badge. It states that a citation shows where a statement comes from, not that it is correct. With no citations it says the answer is unsupported.
+- When this ticket has no confirmed issue and the answer contains `candidate` or `historicalConfirmation` findings, a note states that issues mentioned are possible matches until confirmed. This is derived from the investigation data, not from the AI text, and the AI text itself is not changed.
+- Footer: a review reminder when `humanReviewRequired` is true, and a note when `evidenceComplete` is false. Provider, model, token counts and the evidence contract version stay in state but are not shown.
+
+### Live verification (2026-11-03, `gemini-3.5-flash-lite`, 6 calls)
+
+- **TCK-1046**, "Have other customers experienced this issue, and is there a known fix?": `answered`. BUG-231 shown as Possible; TCK-1017 and TCK-1018 as Confirmed on other cases; the 2.3.2 fix and KB-012 as Documented; patch version unknown as uncertainty; next steps to verify the patch version and share the KB-012 workaround. The no-confirmed-issue note appeared. Four rapid submit attempts produced one request.
+- **TCK-1006**, "Is this a known product defect or could it be related to configuration?": the first call failed with provider HTTP 503 (shown as temporarily unavailable); the manual retry returned `answered`, citing the configuration resolution (missing `reports:read` scope) as Documented, with no defect claim.
+- **TCK-1043**, "What is the most likely cause of the webhook delays…?" (sent with Ctrl+Enter): `insufficientEvidence`, shown with the Not enough evidence badge; BUG-247 and BUG-213 as Possible, KB-018 as Documented, next step to review KB-018 and delivery logs.
+- Switching from TCK-1017 to TCK-1046 during a request aborted it (`net::ERR_ABORTED`); no answer appeared on TCK-1046. "Cancel" aborted a request and kept the question.
+- With the API stopped: "ResolveNest could not reach the investigation service"; the ticket evidence stayed on screen.
+- Error mapping for 400, 404, 503 (both kinds), 429, 504, 422, `answerRejected`, auth failure, proxy 502 and the client timeout was checked by calling `toAskError` in the page with constructed Axios errors, not by triggering them on the server.
+- Validation: empty, whitespace, 3 characters and 1,001 characters keep Ask disabled with a message; no `/ask` request on load or on example click. 375 px: no horizontal scroll. No console errors after a fresh load.
+
+Not verified live: rate limiting, provider timeout, blocked responses and `answerRejected` from the real server; screen-reader output.
+
+### Known risks
+
+- The model's summary can read more strongly than its findings. In the Acme run it said the issue "is tracked as BUG-231" while the finding was correctly classified as a candidate. The backend validator's hedge rules accepted it. The UI does not rewrite AI text; it relies on the finding badges, the no-confirmed-issue note and the review reminder. Tightening the validator is a backend decision.
+- The ID formatter changes only prefixed identifiers in AI text for display; the original text stays in state.
+- Example questions are generic and not tailored to the ticket.
+
 ## Known limitations
 
 - The selected ticket is not in the URL, so a reload returns to Acme.
 - Only the four demo tickets are selectable; there is no ticket search API.
-- The main bundle is about 465 KB (149 KB gzip), with no code splitting.
+- The main bundle is about 490 KB (155 KB gzip), with no code splitting.
 - `npm audit` reports a moderate `minimatch` advisory through the existing ESLint toolchain (dev only), unrelated to the packages added here.
