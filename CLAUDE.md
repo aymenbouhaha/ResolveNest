@@ -22,6 +22,7 @@ Implemented (Phase 2):
 - Synthetic dataset. Hand-authored sources are in `data/curated/`. `data/scripts/generate-seed.mjs` writes the committed output to `data/seed/` (40 customers, 300 tickets, 60 bugs, 16 releases, 12 features, 30 KB articles), and `data/scripts/validate-seed.mjs` validates it. See `docs/seed-data.md`.
 - Seed ingestion: `apps/api/ResolveNest.Api/Features/Ingestion/`, run as the manual `ingest-seed` CLI verb of the API executable (never on startup, no endpoint). Loads Customer, Feature, Release, Bug and SupportTicket with REPORTED, ABOUT_FEATURE, CONFIRMED_AS, AFFECTS, INTRODUCED_IN and FIXED_IN. See `docs/ingestion.md`.
 - Knowledge ingestion: the manual `ingest-knowledge` CLI verb loads the 30 KnowledgeArticle nodes (full Markdown in `content`) with manifest-defined ADDRESSES and COVERS. It runs after `ingest-seed`, and the two can then be repeated in any order. Verified graph: 458 nodes, 1,060 relationships.
+- Graph investigation queries: read-only, parameterized Cypher in `db/neo4j/queries/` (ticket evidence, candidate bugs, supporting knowledge) with a confirmed/documented/candidate/context evidence contract. See `docs/graph-investigations.md`. Not yet wired into the API.
 
 Not implemented yet: investigation APIs, LLM integration, real UI.
 
@@ -65,6 +66,8 @@ ASPNETCORE_ENVIRONMENT=Development dotnet run --project apps/api/ResolveNest.Api
 # Knowledge article ingestion (run after ingest-seed; idempotent)
 ASPNETCORE_ENVIRONMENT=Development dotnet run --project apps/api/ResolveNest.Api --no-launch-profile --no-build -- ingest-knowledge --dry-run
 ASPNETCORE_ENVIRONMENT=Development dotnet run --project apps/api/ResolveNest.Api --no-launch-profile --no-build -- ingest-knowledge
+
+# Read-only investigation queries in db/neo4j/queries/: run them with cypher-shell --access-mode read (exact commands in docs/graph-investigations.md)
 
 # Frontend (run from apps/web); dev server on :5173, strictPort, proxies /api -> http://localhost:5080
 npm install
@@ -132,4 +135,4 @@ The user wants to understand each engineering decision. For every task:
 
 Never commit, push, delete data (including Neo4j volumes) or run destructive commands without explicit approval.
 
-Roadmap: (1) setup/connectivity ✅ → (2) graph schema, synthetic data, CSV/JSON ingestion, idempotent writes ✅ (pending review) → (3) investigation APIs, multi-hop queries, provenance → (4) grounded AI, citations, reply-draft workflow → (5) frontend investigation UX, docs, demo.
+Roadmap: (1) setup/connectivity ✅ → (2) graph schema, synthetic data, CSV/JSON and knowledge ingestion, investigation queries ✅ (pending review) → (3) investigation APIs, multi-hop queries, provenance → (4) grounded AI, citations, reply-draft workflow → (5) frontend investigation UX, docs, demo.
