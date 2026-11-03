@@ -1,6 +1,8 @@
 import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useNavigationLock } from '@/lib/navigationLock'
 import { AskResolveNestSection } from './components/answer/AskResolveNestSection'
+import { ReplyDraftSection } from './components/replyDraft/ReplyDraftSection'
 import { CandidateBugsSection } from './components/CandidateBugsSection'
 import { ConfirmedBugsSection } from './components/ConfirmedBugsSection'
 import { InvestigationErrorState, InvestigationSkeleton } from './components/InvestigationStates'
@@ -21,6 +23,7 @@ interface InvestigationWorkspaceProps {
 export function InvestigationWorkspace({ ticketId, scenarioLabel }: InvestigationWorkspaceProps) {
   const { state, reload } = useInvestigation(ticketId)
   const isLoading = state.status === 'loading'
+  const { isLocked: isNavigationLocked } = useNavigationLock()
 
   return (
     <div className="space-y-6">
@@ -34,7 +37,7 @@ export function InvestigationWorkspace({ ticketId, scenarioLabel }: Investigatio
             {scenarioLabel ? <span className="text-muted-foreground"> · {scenarioLabel}</span> : null}
           </p>
         </div>
-        <Button variant="outline" onClick={reload} disabled={isLoading}>
+        <Button variant="outline" onClick={reload} disabled={isLoading || isNavigationLocked}>
           <RefreshCw className={isLoading ? 'animate-spin' : undefined} aria-hidden="true" />
           {isLoading ? 'Loading' : 'Refresh'}
         </Button>
@@ -57,6 +60,7 @@ function InvestigationResult({ investigation }: { investigation: TicketInvestiga
       <div className="min-w-0 space-y-8">
         <TicketOverview investigation={investigation} />
         <AskResolveNestSection key={investigation.ticket.id} investigation={investigation} />
+        <ReplyDraftSection key={`reply-${investigation.ticket.id}`} investigation={investigation} />
         <div className="xl:hidden">
           <InvestigationSummary investigation={investigation} />
         </div>

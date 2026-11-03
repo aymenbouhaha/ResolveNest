@@ -1,20 +1,13 @@
-import { CircleX, Loader2, RefreshCw, Sparkles, X } from 'lucide-react'
+import { CircleX, Loader2, Sparkles, X } from 'lucide-react'
 import { useId, useState, type FormEvent, type KeyboardEvent } from 'react'
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
-import type { AskError } from '../../api/investigationAskErrors'
 import { useInvestigationAsk } from '../../hooks/useInvestigationAsk'
 import { MAX_QUESTION_CHARACTERS, validateQuestion } from '../../lib/questionRules'
 import type { TicketInvestigation } from '../../types/investigation'
+import { ServiceErrorAlert } from '../ServiceErrorAlert'
 import { InvestigationAnswerView } from './InvestigationAnswerView'
 
 const EXAMPLE_QUESTIONS = [
@@ -136,9 +129,11 @@ export function AskResolveNestSection({ investigation }: AskResolveNestSectionPr
           {state.status === 'asking' ? <AskingPlaceholder question={state.question} /> : null}
 
           {state.status === 'failed' ? (
-            <AskErrorAlert
-              error={state.error}
-              onRetry={() => void ask(state.question)}
+            <ServiceErrorAlert
+              title={state.error.title}
+              message={state.error.message}
+              technicalDetail={state.error.technicalDetail}
+              onRetry={state.error.retryable ? () => void ask(state.question) : undefined}
               onDismiss={clear}
             />
           ) : null}
@@ -180,48 +175,5 @@ function AskingPlaceholder({ question }: { question: string }) {
         <Skeleton className="h-4 w-3/5" />
       </div>
     </div>
-  )
-}
-
-interface AskErrorAlertProps {
-  error: AskError
-  onRetry: () => void
-  onDismiss: () => void
-}
-
-function AskErrorAlert({ error, onRetry, onDismiss }: AskErrorAlertProps) {
-  return (
-    <Alert variant="destructive" className="gap-1.5 px-4 py-4">
-      <CircleX aria-hidden="true" />
-      <AlertTitle>{error.title}</AlertTitle>
-      <AlertDescription className="space-y-3">
-        <p className="text-foreground/80">{error.message}</p>
-        <div className="flex flex-wrap gap-2">
-          {error.retryable ? (
-            <Button type="button" variant="outline" size="sm" onClick={onRetry}>
-              <RefreshCw aria-hidden="true" />
-              Please try again
-            </Button>
-          ) : null}
-          <Button type="button" variant="ghost" size="sm" onClick={onDismiss}>
-            Dismiss
-          </Button>
-        </div>
-        {error.technicalDetail ? (
-          <Accordion type="single" collapsible>
-            <AccordionItem value="technical-details">
-              <AccordionTrigger className="py-1.5 text-xs text-muted-foreground">
-                Technical details
-              </AccordionTrigger>
-              <AccordionContent>
-                <p className="font-mono text-xs break-all text-muted-foreground">
-                  {error.technicalDetail}
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
-        ) : null}
-      </AlertDescription>
-    </Alert>
   )
 }

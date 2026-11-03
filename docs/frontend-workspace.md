@@ -1,6 +1,6 @@
 # Investigation Workspace (frontend)
 
-Phase 5, Tasks 1 and 2. A React workspace over `GET /api/investigations/tickets/{ticketId}` (see [investigation-api.md](investigation-api.md)) with an "Ask ResolveNest" panel over `POST …/ask` (see [gemini-integration.md](gemini-integration.md) and [Ask ResolveNest](#ask-resolvenest-task-2)). It has no reply drafting and no writes.
+Phase 5, Tasks 1 and 2. A React workspace over `GET /api/investigations/tickets/{ticketId}` (see [investigation-api.md](investigation-api.md)) with an "Ask ResolveNest" panel over `POST …/ask` (see [gemini-integration.md](gemini-integration.md) and [Ask ResolveNest](#ask-resolvenest-task-2)). Task 3 adds a human-reviewed reply draft panel; its approval step is the only write, and nothing sends email.
 
 Code: `apps/web/src/`.
 
@@ -205,9 +205,87 @@ Not verified live: rate limiting, provider timeout, blocked responses and `answe
 - The ID formatter changes only prefixed identifiers in AI text for display; the original text stays in state.
 - Example questions are generic and not tailored to the ticket.
 
+## Customer reply draft (Task 3)
+
+A panel under Ask ResolveNest drives the existing preview and approval endpoints (see [reply-drafting.md](reply-drafting.md)). Preview never writes. Approval is the only write, and it happens only after an explicit confirmation dialog. Nothing in the frontend sends email, and there is no Send button.
+
+### Code
+
+| File | Responsibility |
+|---|---|
+| `types/replyDraft.ts` | Mirror of `ReplyDraftPreview`, `ContextLimitation`, `ReplyDraftApprovalRequest`, `ApprovedReplyDraft`, `ReplyDraftApprovalResult` |
+| `api/replyDraftApi.ts` | `generateReplyDraftPreview(ticketId, guidance, signal)` (75 s, cancellable; body `{}` or `{ reviewerGuidance }`) and `approveReplyDraft(ticketId, token, finalText)` (30 s, **no abort signal**, body `{ previewToken, finalText, approved: true }`) |
+| `api/replyDraftGuards.ts` | Shape checks; the preview must have `persisted: false` and a token; the result's `ticketId` must match |
+| `api/replyDraftErrors.ts` | Preview errors reuse the Ask mapping with preview wording, plus `draftRejected`; approval errors have their own mapping (below) |
+| `lib/replyDraftRules.ts` | Client copy of the server rules: guidance at most 500 characters; final text 40 to 4,000 characters after trimming, no control characters, no `rec:`/`rel:` IDs or placeholders (`{{ }}`, `[Customer Name]`, `[insert …]`, `<insert`) |
+| `lib/evidenceLimitationText.ts` | Product wording for the 13 `ContextLimitation` codes; unknown codes fall back to the server message with IDs formatted |
+| `hooks/useReplyDraft.ts` | The workflow state machine |
+| `lib/navigationLock.ts` | Context that locks ticket navigation and Refresh while an approval is in flight |
+| `components/replyDraft/*` | Section, editor, evidence panel, confirmation dialog, saved summary |
+| `components/ServiceErrorAlert.tsx` | Shared error alert (also used by Ask ResolveNest now) |
+
+### Workflow and state
+
+```
+idle ─► generating ─► reviewing ─► (confirm dialog) ─► approving ─► approved
+          │              ▲  │                              │
+          ▼              │  └── edit text                  ▼
+   generationFailed      └──────────────────────── approvalFailed
+```
+
+- Each state carries only what it needs, so the preview token, the draft text and the result cannot drift apart. The token lives only in React state, never in storage or the URL, and is never decoded.
+- **No automatic calls.** Nothing is generated on ticket load or when instructions change. "Generate new preview" asks before discarding edits.
+- **Duplicate protection.** The submit button is disabled while a request runs, and the hook ignores a second call through a ref guard: one preview at a time, and no preview while approving.
+- **Confirmation is bound to the text.** "Approve & save" snapshots the trimmed text. The modal dialog shows that exact text, and confirming sends that snapshot, not whatever the editor holds later. Focus starts on "Keep reviewing" and returns to the Approve button afterwards.
+- **Approval is never aborted.** Browser cancellation would not undo a server write, so the approval request has no abort signal. While it runs, the sidebar ticket buttons and Refresh are disabled, a `beforeunload` prompt is registered, and the section stays mounted. Results are applied only while it is mounted.
+- **Ticket switch.** Both panels are keyed by ticket ID. Switching aborts an in-flight preview (read-only) and discards the draft, so tokens never cross tickets.
+- **Expiry.** `previewExpiresAt` is checked every 15 s. After it passes, approval is disabled and an "expired, nothing was saved" message appears. The server remains the authority (400 `previewTokenExpired`).
+
+### Approval outcome mapping
+
+| Server result | UI | Editable | Action offered |
+|---|---|---|---|
+| 201 / 200 (`alreadyApproved`) | "Approved draft saved", metadata, "No email has been sent" | no | Copy approved text, Start a new draft |
+| 400 `previewTokenExpired` | Expired, nothing saved | no | Start over with a new preview |
+| 400 `invalidPreviewToken` / `previewTicketMismatch` | Can no longer be approved, nothing saved | no | Start over |
+| 400 validation | Text did not meet requirements, nothing saved | yes | Edit and approve again |
+| 404 | Ticket not found, nothing saved | no | Start over |
+| 409 `replyDraftConflict` | Already approved with different text | no | Start over |
+| 503 `replyDraftStorageNotInitialized` | Saving not set up | no | Start over |
+| 503 without reason (database; the server says nothing was committed) | Not saved | yes | Try saving again (manual) |
+| No response, timeout, 5xx without Problem Details (proxy), other 5xx, or a 2xx with an unexpected body | **We could not confirm whether the draft was saved** | no | Re-send the same approval (manual) |
+
+The "outcome unknown" case relies on the server's idempotency. The same token with the same text returns 200 with the stored record if the first request was saved, or 201 if it was not. The text is locked so a re-send cannot produce a 409. Nothing retries automatically.
+
+### Review presentation
+
+- The draft editor is labelled "AI-generated · needs your review". `insufficientEvidence` shows "Holding reply" with an explanation.
+- Unchanged text shows: passed automated checks at generation, which does not prove it is correct; verify every claim.
+- Edited text (compared after CRLF→LF and trim, the same normalization the server uses) shows the required warning *"Your edits have not been automatically checked against the investigation evidence. Review the final text before saving."*, an "Edited by you" badge, and "Restore generated text". The confirmation dialog repeats the warning.
+- "Information used to prepare this draft" is a separate, dashed panel marked "Internal · not part of the reply". It holds the statements the draft relies on (with record chips), uncertainties, investigation limitations in product wording, cited records and connections, and review details (human review required, not saved, approvable-until, condensed evidence). Model, tokens and provider stay in state only.
+- The saved summary shows the ticket, `approvedAt`, edited-by-reviewer, whether the saved text is the checked AI text (`approvedTextValidated`), customer delivery (`notSent` → "Not sent…") and the draft reference. No other timestamps or statuses are invented.
+
+### Verification (2026-11-03)
+
+- `npm run build` and `npm run lint` pass.
+- `ReplyDraft` count read-only before and after all preview work: 0 → 0.
+- **TCK-1046 preview** (with the guidance "Keep the reply concise and ask the customer to confirm their installed patch version."): the draft says the behavior "may be related to a known issue documented in KB-012", mentions the 2.3.2 fix, asks for the exact patch version and offers the XLSX workaround. It contains no bug ID and no resolution claim. The internal panel lists BUG-231 as unconfirmed and the patch version as unknown. Three rapid submits sent one request.
+- **TCK-1043 preview:** acknowledges the delays, points to KB-018 and names no cause; the uncertainty "exact cause … remains unconfirmed" is internal.
+- **TCK-1006 preview:** two attempts both ended in server 504 `aiTimeout` (Gemini did not answer within 45 s). The UI showed "Preview generation took too long … Nothing was saved" with a manual retry. No TCK-1006 draft was produced, so Scenario B is **not verified**.
+- Editing: the warning, badge and restore work. Empty, 10-character and `[Customer Name]` texts disable approval with messages. The dialog showed the exact edited text and the no-email notice; Escape closed it without a request.
+- Switching from TCK-1017 to TCK-1043 during a preview aborted it (`net::ERR_ABORTED`), and the new ticket started clean.
+- Approval error mapping for every row above was checked by calling `toApprovalError` in the page with constructed Axios errors.
+- **Not verified:** any live approval (no `approve` request was sent; a click on the dialog's confirm button was blocked by the session's permission policy); the navigation lock and `beforeunload` while approving; the saved summary with a real result; client-side expiry after 30 minutes. 375 px: no horizontal overflow, no console errors.
+
+### Known risks
+
+- TCK-1006 reply previews timed out twice in a row on the server. The cause (provider latency or model behavior for this ticket) is in the backend and was not changed here.
+- The navigation lock covers the sidebar, the mobile Sheet and Refresh. A browser reload or closing the tab during approval only gets the `beforeunload` prompt; the outcome is then unknown to the UI. The draft can still be found in the database by ticket, but there is no UI to read approved drafts (out of scope).
+- There is no approver identity (`approvalBasis: unauthenticatedLocalRequest`), as documented for the backend.
+
 ## Known limitations
 
 - The selected ticket is not in the URL, so a reload returns to Acme.
 - Only the four demo tickets are selectable; there is no ticket search API.
-- The main bundle is about 490 KB (155 KB gzip), with no code splitting.
+- The main bundle is about 527 KB (164 KB gzip), with no code splitting.
 - `npm audit` reports a moderate `minimatch` advisory through the existing ESLint toolchain (dev only), unrelated to the packages added here.

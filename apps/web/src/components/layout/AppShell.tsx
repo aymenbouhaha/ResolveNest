@@ -6,10 +6,16 @@ import { AppSidebar } from './AppSidebar'
 interface AppShellProps {
   selectedTicketId: string
   onSelectTicket: (ticketId: string) => void
+  isNavigationLocked: boolean
   children: ReactNode
 }
 
-export function AppShell({ selectedTicketId, onSelectTicket, children }: AppShellProps) {
+export function AppShell({
+  selectedTicketId,
+  onSelectTicket,
+  isNavigationLocked,
+  children,
+}: AppShellProps) {
   const [isNavigationOpen, setNavigationOpen] = useState(false)
 
   const selectTicketAndCloseNavigation = (ticketId: string) => {
@@ -27,7 +33,11 @@ export function AppShell({ selectedTicketId, onSelectTicket, children }: AppShel
       </a>
 
       <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-sidebar-border lg:block">
-        <AppSidebar selectedTicketId={selectedTicketId} onSelectTicket={onSelectTicket} />
+        <AppSidebar
+          selectedTicketId={selectedTicketId}
+          onSelectTicket={onSelectTicket}
+          isNavigationLocked={isNavigationLocked}
+        />
       </aside>
 
       <Sheet open={isNavigationOpen} onOpenChange={setNavigationOpen}>
@@ -37,6 +47,7 @@ export function AppShell({ selectedTicketId, onSelectTicket, children }: AppShel
           <AppSidebar
             selectedTicketId={selectedTicketId}
             onSelectTicket={selectTicketAndCloseNavigation}
+            isNavigationLocked={isNavigationLocked}
           />
         </SheetContent>
       </Sheet>

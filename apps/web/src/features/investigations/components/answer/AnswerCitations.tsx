@@ -36,13 +36,14 @@ export function CitationChips({ citationIds, citations }: CitationChipsProps) {
 
 interface SupportingRecordsListProps {
   citations: CitationPresentation[]
+  subject?: string
 }
 
-export function SupportingRecordsList({ citations }: SupportingRecordsListProps) {
+export function SupportingRecordsList({ citations, subject = 'answer' }: SupportingRecordsListProps) {
   if (citations.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        This answer does not cite any ticket records. Treat it as unsupported until you check the
+        This {subject} does not cite any ticket records. Treat it as unsupported until you check the
         records above.
       </p>
     )
@@ -54,7 +55,7 @@ export function SupportingRecordsList({ citations }: SupportingRecordsListProps)
   return (
     <div className="space-y-3">
       <p className="text-xs text-muted-foreground">
-        The answer cites these ticket records. A citation shows where a statement comes from, not
+        The {subject} cites these ticket records. A citation shows where a statement comes from, not
         that the statement is correct.
       </p>
       {records.length > 0 ? (

@@ -5,9 +5,10 @@ import { DEMO_TICKETS, shortTicketId } from '@/features/investigations/demoTicke
 interface AppSidebarProps {
   selectedTicketId: string
   onSelectTicket: (ticketId: string) => void
+  isNavigationLocked: boolean
 }
 
-export function AppSidebar({ selectedTicketId, onSelectTicket }: AppSidebarProps) {
+export function AppSidebar({ selectedTicketId, onSelectTicket, isNavigationLocked }: AppSidebarProps) {
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex h-16 items-center gap-2.5 border-b border-sidebar-border px-5">
@@ -47,8 +48,10 @@ export function AppSidebar({ selectedTicketId, onSelectTicket }: AppSidebarProps
                     type="button"
                     onClick={() => onSelectTicket(demoTicket.ticketId)}
                     aria-current={isActive ? 'true' : undefined}
+                    disabled={isNavigationLocked && !isActive}
+                    title={isNavigationLocked && !isActive ? 'Wait until the approved draft is saved' : undefined}
                     className={cn(
-                      'group flex min-h-11 w-full items-start gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
+                      'group flex min-h-11 w-full items-start gap-2.5 rounded-lg border border-transparent px-2.5 py-2 text-left transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50',
                       isActive ? 'border-primary/25 bg-accent' : 'hover:bg-muted',
                     )}
                   >
