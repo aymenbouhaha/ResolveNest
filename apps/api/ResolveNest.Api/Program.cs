@@ -1,7 +1,28 @@
+using Neo4j.Driver;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Read Neo4j configuration
+var neo4jUri = builder.Configuration["Neo4j:Uri"]
+    ?? throw new InvalidOperationException("Neo4j URI is missing.");
+
+var neo4jUsername = builder.Configuration["Neo4j:Username"]
+    ?? throw new InvalidOperationException("Neo4j username is missing.");
+
+var neo4jPassword = builder.Configuration["Neo4j:Password"]
+    ?? throw new InvalidOperationException("Neo4j password is missing.");
+
+// Register the Neo4j driver
+builder.Services.AddSingleton<IDriver>(_ =>
+    GraphDatabase.Driver(
+        neo4jUri,
+        AuthTokens.Basic(neo4jUsername, neo4jPassword)
+    )
+);
 
 var app = builder.Build();
 
+// Application health endpoint
 app.MapGet("/api/health", () =>
 {
     return Results.Ok(new
@@ -9,6 +30,32 @@ app.MapGet("/api/health", () =>
         status = "healthy",
         service = "ResolveNest.Api"
     });
+});
+
+// Database connectivity endpoint
+app.MapGet("/api/health/db", async (
+    IDriver driver,
+    ILogger<Program> logger) =>
+{
+    try
+    {
+        await driver.VerifyConnectivityAsync();
+
+        return Results.Ok(new
+        {
+            status = "healthy",
+            database = "neo4j"
+        });
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Neo4j connectivity check failed");
+
+        return Results.Problem(
+            title: "Database unavailable",
+            statusCode: StatusCodes.Status503ServiceUnavailable
+        );
+    }
 });
 
 app.Run();
