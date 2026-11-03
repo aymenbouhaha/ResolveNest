@@ -217,7 +217,7 @@ The live Acme request used 6,184 prompt tokens, as counted by the provider. The 
 | `answered` has findings; `insufficientEvidence` has uncertainties | `inconsistentStatus` |
 | `confirmedForTicket` cites `rel:<ticket>>CONFIRMED_AS><bug>` for a bug in `confirmedBugs`. `historicalConfirmation` cites another ticket's CONFIRMED_AS, or a candidate bug record (which carries the counts). | `unsupportedConfirmation` |
 | `candidate` cites a source about a candidate bug | `unsupportedClassification` |
-| No sentence presents a candidate bug as the cause, or as confirmed for this ticket, unless hedged (`not`, `may`, `whether`, `candidate`, …); `confirmedForTicket` naming a candidate | `candidatePromotedToConfirmed` |
+| No sentence presents a candidate bug as the cause, or as confirmed for this ticket, unless hedged (`not`, `may`, `whether`, `candidate`, …); `confirmedForTicket` naming a candidate. Since Task 2.1, any sentence that names a candidate **and** refers to the ticket or its problem must carry a qualifier (see [Candidate qualification rule](#candidate-qualification-rule-task-21)) | `candidatePromotedToConfirmed` |
 | While the ticket is not resolved or closed, no sentence about the customer or ticket claims it "is/has been resolved/fixed" unless hedged (`once`, `after`, `if`, `should`, `upgrade`, …) | `unsupportedResolutionClaim` |
 | No claim that an email, reply, draft or message was sent, saved, delivered or scheduled, and no "we have sent/emailed/contacted…" | `unsupportedActionClaim` |
 
@@ -312,12 +312,71 @@ Other live calls made during setup:
   - The model can still be misled into a wrong but well-cited statement; the validator catches only the specific patterns above.
 - **No persistence.** Questions and answers are not stored. Answers are suggestions for a human (`humanReviewRequired: true`). Nothing is sent to customers.
 
+## Candidate qualification rule (Task 2.1)
+
+### Observed failure
+
+A live TCK-1046 answer (2026-11-03) said: "Yes, other customers have experienced this issue, which is tracked as bug:BUG-231 and documented in article kb:KB-012." Its findings correctly classified BUG-231 as `candidate`, but the summary equated Acme's issue with BUG-231, and the validator accepted it.
+
+### Root cause
+
+The cause was in `GroundedClaimRules.PromotesCandidate`, combined with weak prompt wording:
+
+1. **Negative verb list.** The rule rejected only cause wording ("root cause", "caused by", …) and "confirmed" wording ("is confirmed", "confirmed for <ticket>"). Identity or attribution wording ("is tracked as", "is BUG-231", "corresponds to", "due to", "the same issue as") was not recognized at all.
+2. **Target recognition.** The sentence referred to Acme's problem only as "this issue". The target terms were the ticket ID, "this ticket", "the ticket", "the customer", "customer's", "their issue/problem/export" and the customer name, so the sentence was not treated as being about the ticket.
+3. **Sentence-wide "other" exemption.** Any mention of "other" switched off the confirmation check for the whole sentence, so "other customers … this issue … BUG-231" was read as a statement about other tickets.
+4. **Prompt.** Rule 4 forbade calling a candidate the *cause*, not identifying the ticket's issue *as* the candidate. Rule 11 asked the summary to "agree with" the findings, not to be no stronger than them.
+
+The evidence context was not at fault: BUG-231 was in `candidateBugs` only, its confirmations were under the candidate's history, and the model classified the finding correctly.
+
+### Correction
+
+The check is now positive instead of only negative. `LinksTargetToCandidateWithoutQualifier` applies to every text the validator checks (answer, findings, uncertainties and next steps). A sentence is rejected with `candidatePromotedToConfirmed` when it:
+
+- names a bug that is a candidate and not in `confirmedBugs` (taken from the structured evidence, so confirmed bugs such as BUG-231 on TCK-1017 are never affected),
+- refers to the investigated ticket or its problem (target terms plus "this issue / problem / error / failure", "the reported issue / problem / error / failure", "their error / failure"),
+- has no hedge word (existing list: `not`, `may`, `possible`, `candidate`, `unconfirmed`, `whether`, …) and no counter-evidence word (`against`, `contradicts`, `conflicts`, `inconsistent`, `predates`, `rules out`),
+- and either asserts identity ("tracked/logged/filed/known/identified as", "reported/filed under", "corresponds/maps/belongs/attributed/traced/due to", "the same issue as", "an instance/case of", "stems/results from", "is/was BUG-…"), or does not describe an evidence signal ("same/shared/matching error/code/symptom", "shares", "similar", "matches the error/code", "code matches", "both cite/report/mention").
+
+In short: a sentence that connects the ticket to a candidate must say it is possible, describe only the shared signal, or argue against it. "Other customers" no longer exempts it. The existing cause and confirmation checks are unchanged, and the target extension also makes "This issue was fixed in 2.3.2" an `unsupportedResolutionClaim` while the ticket is open.
+
+Rejection uses the existing `answerRejected` path (502). There is no relabelling, no rewritten answer and no regeneration call. The prompt's rules 4 and 11 now say the same thing to the model, but the validator is the guarantee.
+
+### Examples
+
+| Sentence (TCK-1046 context, BUG-231 candidate) | Result |
+|---|---|
+| Yes, other customers have experienced this issue, which is tracked as bug:BUG-231 … | rejected |
+| This issue is BUG-231, which is confirmed for 21 other customers. | rejected |
+| 21 other customers reported this problem under BUG-231. | rejected |
+| Acme's export failure corresponds to BUG-231. | rejected |
+| This issue and BUG-231 affect CSV exports for other customers. | rejected (no qualifier, no signal) |
+| This issue was fixed in 2.3.2. | rejected (`unsupportedResolutionClaim`) |
+| BUG-231 is a strong possible match for this issue, but it is not confirmed for this ticket. | accepted |
+| This error has the same error code as BUG-231, which is confirmed for 21 other customers. | accepted |
+| Acme's ticket and BUG-231 both cite ERR_EXPORT_SERIALIZE on CSV export. | accepted |
+| BUG-231 was fixed in 2.3.2 and is confirmed for 21 other customers. | accepted (no reference to the ticket) |
+| On TCK-1017: This issue is tracked as BUG-231, which is confirmed for TCK-1017. | accepted (BUG-231 is confirmed there) |
+| On TCK-1006: This error is BUG-244, because both report insufficient_scope. | rejected (identity beats the signal) |
+
+### Verification
+
+- Local tests (`tests/ResolveNest.Api.InvestigationApiTests`, not committed): 297 passed. The new validator cases were added first and failed before the change (12 failures, including the exact observed sentence). New endpoint tests against the local graph cover the observed Acme wording (rejected) and a qualified version (accepted), a TCK-1017 confirmed association (accepted), and a TCK-1006 error-code diagnosis (rejected). The existing TCK-1043 `insufficientEvidence`, TCK-1006 configuration and reply-draft tests still pass.
+- Live (3 calls, `gemini-3.5-flash-lite`): TCK-1046 `answered`, with the summary describing BUG-231 as "a candidate match" and "not confirmed … the cause"; TCK-1006 `answered`, configuration cause, no defect claim; TCK-1043 `insufficientEvidence`, candidates qualified.
+
+### Limits of this rule
+
+- It is still a lexical, English-only, sentence-level guard, not semantic validation. Any hedge word exempts a sentence ("BUG-231 is not just possible, it is this issue" passes). A paraphrase with no listed target term is not checked ("this is clearly BUG-231's problem"), and an identity paraphrase outside the list passes when it also contains a signal phrase ("this issue clearly shares everything with BUG-231").
+- The reverse error also exists: an unhedged factual sentence that mentions the ticket and a candidate without a listed signal phrase is rejected, which costs one failed request. The signal list was widened once for "both cite" after an existing fixture failed; more such cases may appear.
+- References to the ticket that are not in the target list ("the export problem Acme saw" is covered by the customer name, "the export problem" is not) are not checked.
+- The rule constrains wording, not completeness or numbers.
+
 ## Known limitations
 
 - **Model availability changes:**
   - `gemini-2.5-flash` is closed to this project, and `gemini-3.5-flash-lite` was chosen from documentation and probes on one day.
   - Free-tier status, quotas and model access can change; `aiModelUnavailable` and `aiRateLimited` surface this.
-- **Heuristic claim checks:** English-only regular expressions at sentence level. A hedge word anywhere in the sentence exempts it (for example "BUG-231 is the root cause, not a configuration issue" passes because of "not"). Paraphrases without the listed phrases ("this is definitely BUG-231") are not caught. Wrong numbers and versions in prose are not cross-checked.
+- **Heuristic claim checks:** English-only regular expressions at sentence level. A hedge word anywhere in the sentence exempts it (for example "BUG-231 is the root cause, not a configuration issue" passes because of "not"). Task 2.1 closed the identity wording case ("this issue is tracked as BUG-231"), but paraphrases outside the listed phrases can still pass. See [Limits of this rule](#limits-of-this-rule). Wrong numbers and versions in prose are not cross-checked.
 - **Citation relevance is not checked:** a citation must exist and fit the kind rules, but whether it supports the exact sentence is not verified.
 - **No retries:** a transient provider error fails the request; the client may retry.
 - **Characters vs tokens:** limits are in characters. Actual token use is reported by the provider in `provenance`.

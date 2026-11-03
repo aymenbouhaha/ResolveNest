@@ -6,6 +6,13 @@ namespace ResolveNest.Api.Features.AiInvestigations;
 
 public static partial class GroundedClaimRules
 {
+    private static readonly string[] ReportedProblemTerms =
+    [
+        "this issue", "this problem", "this error", "this failure",
+        "the reported issue", "the reported problem", "the reported error", "the reported failure",
+        "their error", "their failure",
+    ];
+
     public static JsonSerializerOptions StrictSerializerOptions { get; } = CreateStrictOptions();
 
     public static void Check(IEnumerable<string> texts, AnswerValidationContext context, SortedSet<string> reasons, IReadOnlyList<string>? extraTargetTerms = null)
@@ -15,7 +22,8 @@ public static partial class GroundedClaimRules
         {
             var mentionsTarget = targetPattern.IsMatch(sentence);
 
-            if (PromotesCandidate(sentence, mentionsTarget, targetPattern, context))
+            if (PromotesCandidate(sentence, mentionsTarget, targetPattern, context)
+                || LinksTargetToCandidateWithoutQualifier(sentence, mentionsTarget, context))
             {
                 reasons.Add(AnswerRejectionReasons.CandidatePromotedToConfirmed);
             }
@@ -81,9 +89,28 @@ public static partial class GroundedClaimRules
         return claimsCause || claimsTargetConfirmation || confirmedForTarget;
     }
 
+    private static bool LinksTargetToCandidateWithoutQualifier(string sentence, bool mentionsTarget, AnswerValidationContext context)
+    {
+        var mentionedCandidates = MentionedCandidates(sentence, context).ToList();
+        if (!mentionsTarget || mentionedCandidates.Count == 0 || CauseHedge().IsMatch(sentence) || CounterEvidence().IsMatch(sentence))
+        {
+            return false;
+        }
+
+        var assertsIdentity = IdentityClaim().IsMatch(sentence)
+            || mentionedCandidates.Any(id => NamesCandidateAsSubjectComplement(sentence, id));
+        return assertsIdentity || !EvidenceSignal().IsMatch(sentence);
+    }
+
+    private static bool NamesCandidateAsSubjectComplement(string sentence, string candidateId) => Regex.IsMatch(
+        sentence,
+        $@"\b(?:is|are|was|were)\s+(?:bug:)?{Regex.Escape(DisplayKey(candidateId))}(?![0-9])",
+        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+
     private static Regex TargetPattern(AnswerValidationContext context, IReadOnlyList<string> extraTargetTerms)
     {
         var terms = new List<string> { DisplayKey(context.TicketId), "this ticket", "the ticket", "the customer", "customer's", "their issue", "their problem", "their export" };
+        terms.AddRange(ReportedProblemTerms);
         terms.AddRange(extraTargetTerms);
         if (!string.IsNullOrWhiteSpace(context.CustomerName))
         {
@@ -113,6 +140,15 @@ public static partial class GroundedClaimRules
 
     [GeneratedRegex(@"\b(not|no|never|unconfirmed|cannot|can't|isn't|aren't|wasn't|without|unverified|unclear|uncertain|unknown|may|might|could|possible|possibly|likely|potential|potentially|candidate|suspected|whether|if|until|unless|would)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex CauseHedge();
+
+    [GeneratedRegex(@"\b(tracked|logged|filed|recorded|identified|known|classified|reported)\s+(as|under)\b|\b(corresponds?|maps?|belongs?|tied|attributed|traced|due)\s+to\b|\bthe\s+same\s+(issue|bug|defect|problem|error)\s+as\b|\ban?\s+(known\s+)?(instance|case|occurrence|manifestation|example)\s+of\b|\b(stems?|results?|resulting)\s+from\b|\b(problem|issue|error|failure)\s+under\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    private static partial Regex IdentityClaim();
+
+    [GeneratedRegex(@"\b(same|matching|shared|identical)\s+(error|code|symptom|failure|behaviou?r|feature)\w*|\bshares?\b|\bsimilar\b|\bmatch(es|ed|ing)?\s+(the\s+|its\s+|their\s+|this\s+)?(error|code|symptom)|\b(error|code)s?\s+match(es|ed)?\b|\bboth\s+(cite|report|mention|show|reference|include)\w*", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    private static partial Regex EvidenceSignal();
+
+    [GeneratedRegex(@"\b(against|contradicts?|contradicted|conflicts?|conflicting|inconsistent|predates?|rules?\s+out|ruled\s+out)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
+    private static partial Regex CounterEvidence();
 
     [GeneratedRegex(@"\b(other|others|another)\b", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]
     private static partial Regex OtherTickets();
