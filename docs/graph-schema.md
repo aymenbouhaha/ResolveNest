@@ -15,6 +15,7 @@ Every node has a canonical string `id`. Future ingestion sets it, and it is neve
 | `Feature` | `feature:csv-export` | `name`, `area` |
 | `Release` | `release:2.3.0` | `version`, `releasedAt`, `notes` |
 | `KnowledgeArticle` | `kb:KB-012` | `title`, `summary`, `content` (full Markdown), `sourcePath`, `updatedAt` |
+| `ReplyDraft` | `reply-draft:<previewId>` | `status` (`approved`), `approvedText`, `generatedText`, `editedByHuman`, `citationIds`, `approvedAt`. Written only by explicit human approval; see [reply-drafting.md](reply-drafting.md). |
 
 `reportedVersion` on a ticket is a plain string the customer gave us. It is deliberately not a relationship to `Release`, because customers often report versions loosely ("2.3", "latest").
 
@@ -40,6 +41,7 @@ All relationships are directed as listed. There is at most one relationship of a
 | `(Bug)-[:FIXED_IN]->(Release)` | The bug is fixed in this release. The fix status is derived from this link, not only from `Bug.status`. |
 | `(KnowledgeArticle)-[:ADDRESSES]->(Bug)` | The article documents this bug (known issue, workaround or fix notes). |
 | `(KnowledgeArticle)-[:COVERS]->(Feature)` | The article explains or troubleshoots this feature. |
+| `(SupportTicket)-[:HAS_REPLY_DRAFT]->(ReplyDraft)` | A human approved this reply draft for the ticket. Created only by the approval endpoint, never by ingestion. |
 
 The requested `(Bug)->(Release)` pair is split into two types, `INTRODUCED_IN` and `FIXED_IN`. The demo question ("stopped working after 2.3 … has it been fixed?") needs both facts. A single type with a `role` property would make every query filter on a property and would be easy to misread.
 
@@ -82,7 +84,7 @@ When ingestion normalizes a reference, it keeps the raw value as well (for examp
 
 Enforced by Neo4j (Community Edition):
 
-- `id` is unique per label. There are six named constraints, listed below.
+- `id` is unique per label. There are seven named constraints, listed below.
 
 Not enforceable in Community Edition, so ingestion code must validate:
 
@@ -104,6 +106,7 @@ Not enforceable in Community Edition, so ingestion code must validate:
 | `feature_id_unique` | `Feature` | `id` |
 | `release_id_unique` | `Release` | `id` |
 | `knowledge_article_id_unique` | `KnowledgeArticle` | `id` |
+| `reply_draft_id_unique` | `ReplyDraft` | `id` (required before reply-draft approval can write) |
 
 Each uniqueness constraint has its own backing RANGE index, which also serves `MATCH`/`MERGE` lookups by `id`. Do not add separate indexes on `id`.
 
@@ -117,7 +120,7 @@ Run these from the repo root with the Compose Neo4j service running (`docker com
 # Apply (idempotent; re-running is a no-op)
 docker compose exec -T neo4j sh -c 'cypher-shell -u neo4j -p "${NEO4J_AUTH#neo4j/}"' < db/neo4j/schema.cypher
 
-# Verify: expect the six constraints above, type NODE_PROPERTY_UNIQUENESS
+# Verify: expect the seven constraints above, type NODE_PROPERTY_UNIQUENESS
 docker compose exec -T neo4j sh -c 'cypher-shell -u neo4j -p "${NEO4J_AUTH#neo4j/}" "SHOW CONSTRAINTS YIELD name, type, labelsOrTypes, properties RETURN name, type, labelsOrTypes, properties ORDER BY name"'
 ```
 

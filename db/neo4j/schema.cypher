@@ -20,3 +20,6 @@ FOR (n:Release) REQUIRE n.id IS UNIQUE;
 
 CREATE CONSTRAINT knowledge_article_id_unique IF NOT EXISTS
 FOR (n:KnowledgeArticle) REQUIRE n.id IS UNIQUE;
+
+CREATE CONSTRAINT reply_draft_id_unique IF NOT EXISTS
+FOR (n:ReplyDraft) REQUIRE n.id IS UNIQUE;

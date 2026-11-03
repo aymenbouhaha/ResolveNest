@@ -33,7 +33,17 @@ Implemented (Phase 3, Task 2):
 Implemented (Phase 4, Task 1):
 - Evidence context builder in `apps/api/ResolveNest.Api/Features/EvidenceContext/`. `EvidenceContextBuilder.Build(TicketInvestigationResponse, EvidenceContextLimits?)` is pure: no Neo4j, no LLM, no endpoint. It produces a bounded, typed `InvestigationEvidenceContext`. Source text appears only as verbatim `SourceExcerpt`s under a character budget, selection is deterministic, limitations are explicit, omissions are reported, and a deduplicated citation catalog uses content-derived `rec:<id>` / `rel:<from>><TYPE>><to>` IDs. See `docs/ai-evidence-context.md`.
 
-Not implemented yet: LLM integration, AI answers and citation validation, reply drafting, further investigation APIs, real UI.
+Implemented (Phase 4, Task 2):
+- `POST /api/investigations/tickets/{ticketId}/ask` in `apps/api/ResolveNest.Api/Features/AiInvestigations/`. It answers a question about one ticket with Google Gemini (`gemini-3.5-flash-lite`, REST through HttpClientFactory, no SDK, no tools, no retries or fallback). The pipeline is investigation → evidence context → compact projection (~18 KB for Acme) → structured JSON output with citations restricted to the supplied IDs → server-side validation (strict parse, citations, confirmed vs candidate, resolution and action claims) → typed answer with `validatedSources`. Invalid answers are rejected (502 `answerRejected`), and provider failures map to sanitized Problem Details. There are no writes and no history. Live-verified for TCK-1046, TCK-1006 and TCK-1043. `gemini-2.5-flash` is closed to new projects. See `docs/gemini-integration.md`.
+
+Implemented (Phase 4, Task 3):
+- Human-reviewed reply drafts in `apps/api/ResolveNest.Api/Features/ReplyDrafts/`.
+  - `POST …/tickets/{ticketId}/reply-drafts/preview` is read-only. It makes one Gemini call over the same projection, and the draft validator rejects internal-ID leaks, unsupported versions, commitments, claimed actions, candidate-as-cause and resolution claims. It returns the draft, internal claims, uncertainties, limitations, validated sources and a 30-minute Data Protection `previewToken` that carries the generated text. Nothing is persisted.
+  - `POST …/reply-drafts/approve` is the only write. It requires `approved: true`, a valid unexpired token for the same ticket, and the final (possibly edited) text. It runs one parameterized MERGE in one write transaction, creating `(SupportTicket)-[:HAS_REPLY_DRAFT]->(ReplyDraft)`. An identical replay returns 200, a conflicting replay 409, and a missing constraint 503. Edited text is stored with `approvedTextValidated: false`. There is no approver identity (`approvalBasis: unauthenticatedLocalRequest`) and nothing is ever sent (`customerDelivery: notSent`).
+  - Verified with mocked and rolled-back tests plus live previews. Live approval was not run.
+  - The new `reply_draft_id_unique` constraint is in `db/neo4j/schema.cypher` and was applied to the local database on 2026-11-03, so the database now has 7 constraints. See `docs/reply-drafting.md`.
+
+Not implemented yet: reading, listing or revoking approved drafts, email delivery (intentionally never), further investigation APIs, real UI, authentication.
 
 Known issues (leave alone unless asked):
 - `README.md` is UTF-16 LE encoded.
@@ -45,7 +55,7 @@ Known issues (leave alone unless asked):
 - Backend: C# / ASP.NET Core 10 Minimal APIs (`net10.0`, nullable enabled), `Neo4j.Driver` 6.x, `Microsoft.AspNetCore.OpenApi` (referenced, not wired up yet).
 - Frontend: React 19, TypeScript ~5.9, Vite 8, ESLint 10 flat config (typescript-eslint, react-hooks, react-refresh).
 - Database: Neo4j Community via Docker Compose.
-- AI: external LLM API; provider not chosen yet.
+- AI: Google Gemini only, through the REST `generateContent` API (model `gemini-3.5-flash-lite`, free tier). No other provider, SDK or orchestration framework.
 - Solution file: `ResolveNest.slnx` (contains only the API project).
 - Dev environment: Windows + Git Bash. Use Bash-compatible commands, not PowerShell.
 
@@ -87,6 +97,12 @@ npm run lint
 # Smoke checks
 curl http://localhost:5080/api/health
 curl http://localhost:5080/api/health/db
+
+# Grounded AI answer (calls Gemini; uses free-tier quota)
+curl -s -X POST http://localhost:5080/api/investigations/tickets/ticket:TCK-1046/ask -H "Content-Type: application/json" -d '{"question":"Is there a known bug for this CSV export failure, and has it been fixed?"}'
+
+# Customer reply preview (calls Gemini; read-only). Approval (/reply-drafts/approve) writes a ReplyDraft: run it only with explicit approval, after applying db/neo4j/schema.cypher
+curl -s -X POST http://localhost:5080/api/investigations/tickets/ticket:TCK-1046/reply-drafts/preview -H "Content-Type: application/json" -d '{}'
 ```
 
 The `http` launch profile (`dotnet run` without flags) listens on :5162, which does **not** match the Vite proxy.
@@ -96,6 +112,7 @@ If a build fails with MSB3021/MSB3027 "file is locked", a running API instance h
 ## Configuration and secrets
 
 - Neo4j settings live in the `Neo4j:Uri`, `Neo4j:Username` and `Neo4j:Password` config section. Uri and Username are in `appsettings.Development.json`. The password comes from user secrets or env (`Neo4j__Password`).
+- The Gemini API key is already stored in user secrets as `Gemini:ApiKey`. Never print, move or re-create it. To check it, verify only that a nonempty value exists. Non-secret Gemini options (`Model`, `TimeoutSeconds`, `MaxOutputTokens`, `Temperature`, `ThinkingLevel`, `BaseUrl`) are in `appsettings.json`. Without a key the app still starts and only `/ask` returns 503. Free-tier Gemini data may be used by Google to improve its products, so send only synthetic or approved non-sensitive data.
 - Root `.env` (gitignored) feeds `NEO4J_PASSWORD` to Compose. Never commit `.env`, secrets or LLM API keys.
 
 ## Architecture and conventions
