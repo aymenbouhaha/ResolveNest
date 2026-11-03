@@ -21,8 +21,9 @@ Implemented (Phase 2):
 - Graph schema contract in `docs/graph-schema.md`. Six uniqueness constraints in `db/neo4j/schema.cypher`, applied manually.
 - Synthetic dataset. Hand-authored sources are in `data/curated/`. `data/scripts/generate-seed.mjs` writes the committed output to `data/seed/` (40 customers, 300 tickets, 60 bugs, 16 releases, 12 features, 30 KB articles), and `data/scripts/validate-seed.mjs` validates it. See `docs/seed-data.md`.
 - Seed ingestion: `apps/api/ResolveNest.Api/Features/Ingestion/`, run as the manual `ingest-seed` CLI verb of the API executable (never on startup, no endpoint). Loads Customer, Feature, Release, Bug and SupportTicket with REPORTED, ABOUT_FEATURE, CONFIRMED_AS, AFFECTS, INTRODUCED_IN and FIXED_IN. See `docs/ingestion.md`.
+- Knowledge ingestion: the manual `ingest-knowledge` CLI verb loads the 30 KnowledgeArticle nodes (full Markdown in `content`) with manifest-defined ADDRESSES and COVERS. It runs after `ingest-seed`, and the two can then be repeated in any order. Verified graph: 458 nodes, 1,060 relationships.
 
-Not implemented yet: KnowledgeArticle ingestion, investigation APIs, LLM integration, real UI.
+Not implemented yet: investigation APIs, LLM integration, real UI.
 
 Known issues (leave alone unless asked):
 - `README.md` is UTF-16 LE encoded.
@@ -60,6 +61,10 @@ node data/scripts/validate-seed.mjs
 # Neo4j ingestion of data/seed (manual, idempotent; --dry-run validates without connecting)
 ASPNETCORE_ENVIRONMENT=Development dotnet run --project apps/api/ResolveNest.Api --no-launch-profile --no-build -- ingest-seed --dry-run
 ASPNETCORE_ENVIRONMENT=Development dotnet run --project apps/api/ResolveNest.Api --no-launch-profile --no-build -- ingest-seed
+
+# Knowledge article ingestion (run after ingest-seed; idempotent)
+ASPNETCORE_ENVIRONMENT=Development dotnet run --project apps/api/ResolveNest.Api --no-launch-profile --no-build -- ingest-knowledge --dry-run
+ASPNETCORE_ENVIRONMENT=Development dotnet run --project apps/api/ResolveNest.Api --no-launch-profile --no-build -- ingest-knowledge
 
 # Frontend (run from apps/web); dev server on :5173, strictPort, proxies /api -> http://localhost:5080
 npm install

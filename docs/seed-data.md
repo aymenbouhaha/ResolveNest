@@ -25,7 +25,7 @@ Generated tickets belong only to the 30 generated customers. The 10 curated cust
 | `releases.csv` | 16 (1.9.0 to 2.4.2) | `synthetic-release-registry` | `Release` |
 | `tickets.json` | 302 raw records, 300 unique tickets | `synthetic-helpdesk` | `SupportTicket` |
 | `bugs.json` | 60 (20 curated + 40 generated) | `synthetic-issue-tracker` | `Bug` |
-| `knowledge/manifest.json` + 30 `*.md` | 30 | `synthetic-kb` | `KnowledgeArticle` (not ingested yet) |
+| `knowledge/manifest.json` + 30 `*.md` | 30 | `synthetic-kb` | `KnowledgeArticle` (via `ingest-knowledge`) |
 
 All timestamps are ISO 8601 UTC. The dataset's "now" is `exported_at` = 2026-11-02T23:00:00Z, and no record is dated after it. Ticket numbers are monotonic within each range (TCK-1xxx is the curated scenario queue, TCK-2xxx the background queue), but the two ranges overlap in time.
 

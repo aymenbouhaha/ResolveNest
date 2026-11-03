@@ -1,8 +1,8 @@
 using Neo4j.Driver;
 using ResolveNest.Api.Features.Ingestion;
 
-var isSeedIngestion = SeedIngestionCommand.IsInvocation(args);
-var builder = WebApplication.CreateBuilder(isSeedIngestion ? [] : args);
+var isIngestionCommand = IngestionCommandLine.IsInvocation(args);
+var builder = WebApplication.CreateBuilder(isIngestionCommand ? [] : args);
 
 // Read Neo4j configuration
 var neo4jUri = builder.Configuration["Neo4j:Uri"]
@@ -22,13 +22,13 @@ builder.Services.AddSingleton<IDriver>(_ =>
     )
 );
 
-builder.Services.AddSeedIngestion(builder.Configuration);
+builder.Services.AddIngestion(builder.Configuration);
 
 var app = builder.Build();
 
-if (isSeedIngestion)
+if (isIngestionCommand)
 {
-    var exitCode = await SeedIngestionCommand.ExecuteAsync(app.Services, args);
+    var exitCode = await IngestionCommandLine.ExecuteAsync(app.Services, args);
     await app.DisposeAsync();
     return exitCode;
 }

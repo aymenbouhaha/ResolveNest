@@ -42,6 +42,16 @@ public static partial class SourceNormalization
 
     public static string ReleaseId(string exactVersion) => $"release:{exactVersion}";
 
+    public static string ArticleKey(string raw) => raw.Trim().ToUpperInvariant();
+
+    public static string ArticleId(string articleKey) => $"kb:{articleKey}";
+
+    public static bool IsCanonicalArticleKey(string articleKey) => ArticleKeyPattern().IsMatch(articleKey);
+
+    public static bool IsCanonicalBugKey(string bugKey) => BugKeyPattern().IsMatch(bugKey);
+
+    public static bool IsCanonicalFeatureKey(string featureKey) => FeatureKeyPattern().IsMatch(featureKey);
+
     public static VersionReference Version(string? raw)
     {
         if (raw is null)
@@ -89,4 +99,13 @@ public static partial class SourceNormalization
 
     [GeneratedRegex(@"^\d+\.\d+$")]
     private static partial Regex MinorLineVersionPattern();
+
+    [GeneratedRegex(@"^KB-\d{3,}$")]
+    private static partial Regex ArticleKeyPattern();
+
+    [GeneratedRegex(@"^BUG-\d+$")]
+    private static partial Regex BugKeyPattern();
+
+    [GeneratedRegex(@"^[a-z0-9]+(-[a-z0-9]+)*$")]
+    private static partial Regex FeatureKeyPattern();
 }

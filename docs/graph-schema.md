@@ -1,7 +1,7 @@
 # Graph schema
 
 ResolveNest's Neo4j knowledge graph contract for the MVP. The schema file is
-[`db/neo4j/schema.cypher`](../db/neo4j/schema.cypher). It holds uniqueness constraints only. Synthetic source data is described in [seed-data.md](seed-data.md). Ingestion of customers, features, releases, bugs and tickets is described in [ingestion.md](ingestion.md). `KnowledgeArticle`, `ADDRESSES` and `COVERS` are part of the contract but are not ingested yet.
+[`db/neo4j/schema.cypher`](../db/neo4j/schema.cypher). It holds uniqueness constraints only. Synthetic source data is described in [seed-data.md](seed-data.md). Ingestion of all six labels and eight relationship types (`ingest-seed` and `ingest-knowledge`) is described in [ingestion.md](ingestion.md).
 
 ## Node labels
 
@@ -14,7 +14,7 @@ Every node has a canonical string `id`. Future ingestion sets it, and it is neve
 | `Bug` | `bug:BUG-231` | `title`, `description`, `status` (`open`/`fixed`/`wontfix`), `severity`, `workaround` |
 | `Feature` | `feature:csv-export` | `name`, `area` |
 | `Release` | `release:2.3.0` | `version`, `releasedAt`, `notes` |
-| `KnowledgeArticle` | `kb:KB-012` | `title`, `summary`, `sourcePath`, `updatedAt` |
+| `KnowledgeArticle` | `kb:KB-012` | `title`, `summary`, `content` (full Markdown), `sourcePath`, `updatedAt` |
 
 `reportedVersion` on a ticket is a plain string the customer gave us. It is deliberately not a relationship to `Release`, because customers often report versions loosely ("2.3", "latest").
 
@@ -72,7 +72,7 @@ Each node and relationship written by ingestion carries:
 | `sourceId` | `TCK-1001` | The raw identifier in that system, unmodified. |
 | `sourceRecord` | `data/seed/customers.csv#row=2`, `data/seed/tickets.json#/records/46`, `data/seed/knowledge/KB-012-csv-export-err-export-serialize.md` | The file plus row, JSON pointer or path that produced this write. |
 | `ingestedAt` | `datetime()` | When the record was last written. |
-| `ingestedBy` | `seed-ingestion` | Which ingestion owns the record. Each ingestion only updates records it owns (see [ingestion.md](ingestion.md#ownership-marker-and-preflight)). |
+| `ingestedBy` | `seed-ingestion`, `knowledge-ingestion` | Which ingestion owns the record. Each ingestion only updates records it owns (see [ingestion.md](ingestion.md#ownership-markers-and-preflight)). |
 
 Relationships carry `sourceSystem`, `sourceRecord`, `ingestedAt` and `ingestedBy` (from the record that asserted the link). `CONFIRMED_AS` also carries `confirmedBy` and `confirmedAt` from the ticket. Citations in AI answers reference `id` and `sourceRecord`. External seed directories are recorded as `external/<directory name>/…`, never as absolute local paths.
 

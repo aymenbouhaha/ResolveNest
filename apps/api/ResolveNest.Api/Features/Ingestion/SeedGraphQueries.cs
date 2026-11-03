@@ -4,12 +4,6 @@ public static class SeedGraphQueries
 {
     public const string SeedOwner = "seed-ingestion";
 
-    public const string ShowConstraints = """
-        SHOW CONSTRAINTS
-        YIELD name, type, labelsOrTypes, properties
-        RETURN name, type, labelsOrTypes, properties
-        """;
-
     public const string FindSeedNodeOwnershipConflicts = """
         MATCH (node)
         WHERE any(label IN labels(node) WHERE label IN $seedLabels)
@@ -49,19 +43,6 @@ public static class SeedGraphQueries
         MATCH (node)
         RETURN count(node) AS total,
                count(CASE WHEN any(label IN labels(node) WHERE label IN $seedLabels) THEN 1 END) AS seedLabeled
-        """;
-
-    public const string CountNodesByLabel = """
-        MATCH (node)
-        UNWIND labels(node) AS label
-        RETURN label, count(*) AS count
-        ORDER BY label
-        """;
-
-    public const string CountRelationshipsByType = """
-        MATCH ()-[relationship]->()
-        RETURN type(relationship) AS type, count(*) AS count
-        ORDER BY type
         """;
 
     public const string MergeCustomers = """
