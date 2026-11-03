@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/apps/" />
+  <Folder Name="/apps/api/">
+    <Project Path="apps/api/ResolveNest.Api/ResolveNest.Api.csproj" />
+  </Folder>
+</Solution>
