@@ -12,4 +12,10 @@
     <PackageReference Include="Neo4j.Driver" Version="6.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\db\neo4j\queries\ticket-evidence.cypher" LogicalName="ResolveNest.Api.Queries.ticket-evidence.cypher" />
+    <EmbeddedResource Include="..\..\..\db\neo4j\queries\ticket-candidates.cypher" LogicalName="ResolveNest.Api.Queries.ticket-candidates.cypher" />
+    <EmbeddedResource Include="..\..\..\db\neo4j\queries\ticket-knowledge.cypher" LogicalName="ResolveNest.Api.Queries.ticket-knowledge.cypher" />
+  </ItemGroup>
+
 </Project>

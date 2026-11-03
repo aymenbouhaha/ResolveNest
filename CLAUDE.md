@@ -22,9 +22,12 @@ Implemented (Phase 2):
 - Synthetic dataset. Hand-authored sources are in `data/curated/`. `data/scripts/generate-seed.mjs` writes the committed output to `data/seed/` (40 customers, 300 tickets, 60 bugs, 16 releases, 12 features, 30 KB articles), and `data/scripts/validate-seed.mjs` validates it. See `docs/seed-data.md`.
 - Seed ingestion: `apps/api/ResolveNest.Api/Features/Ingestion/`, run as the manual `ingest-seed` CLI verb of the API executable (never on startup, no endpoint). Loads Customer, Feature, Release, Bug and SupportTicket with REPORTED, ABOUT_FEATURE, CONFIRMED_AS, AFFECTS, INTRODUCED_IN and FIXED_IN. See `docs/ingestion.md`.
 - Knowledge ingestion: the manual `ingest-knowledge` CLI verb loads the 30 KnowledgeArticle nodes (full Markdown in `content`) with manifest-defined ADDRESSES and COVERS. It runs after `ingest-seed`, and the two can then be repeated in any order. Verified graph: 458 nodes, 1,060 relationships.
-- Graph investigation queries: read-only, parameterized Cypher in `db/neo4j/queries/` (ticket evidence, candidate bugs, supporting knowledge) with a confirmed/documented/candidate/context evidence contract. See `docs/graph-investigations.md`. Not yet wired into the API.
+- Graph investigation queries: read-only, parameterized Cypher in `db/neo4j/queries/` (ticket evidence, candidate bugs, supporting knowledge) with a confirmed/documented/candidate/context evidence contract. See `docs/graph-investigations.md`.
 
-Not implemented yet: investigation APIs, LLM integration, real UI.
+Implemented (Phase 3, Task 1):
+- `GET /api/investigations/tickets/{ticketId}?includeContent=false` in `apps/api/ResolveNest.Api/Features/Investigations/`. Runs ticket-evidence, ticket-candidates and ticket-knowledge (embedded resources from `db/neo4j/queries/`) in one read transaction and maps them to typed DTOs. 400 for a non-canonical ID, 404 unknown, 503 database failure. See `docs/investigation-api.md`. `entity-knowledge.cypher` is not exposed.
+
+Not implemented yet: further investigation APIs, LLM integration, real UI.
 
 Known issues (leave alone unless asked):
 - `README.md` is UTF-16 LE encoded.
