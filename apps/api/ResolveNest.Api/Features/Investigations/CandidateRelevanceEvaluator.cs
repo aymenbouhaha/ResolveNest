@@ -35,7 +35,13 @@ public static class CandidateRelevanceEvaluator
         DescribeHistory(confirmedTicketCount, confirmedCustomerCount, supporting, limitations);
         DescribeTicketState(context, limitations);
 
-        return new CandidateRelevance(TierOf(errorCodes, version), sharedFeatureIds, errorCodes, version, supporting, limitations);
+        var tier = TierOf(errorCodes, version);
+        if (tier == CandidateRelevanceTier.ErrorCodeMatchChronologyConflict)
+        {
+            limitations.Insert(0, new("errorCodeMatchContradictedByIntroduction", $"The shared error code {string.Join(", ", errorCodes.MatchedCodes)} conflicts with release chronology: the reported version '{version.ReportedVersion}' is before the documented introduction release ({string.Join(", ", version.IntroducedInVersions)}). The documented releases argue against this bug unless the version report is wrong or the defect also exists in earlier releases."));
+        }
+
+        return new CandidateRelevance(tier, sharedFeatureIds, errorCodes, version, supporting, limitations);
     }
 
     public static IReadOnlyList<CandidateBug> Order(IEnumerable<CandidateBug> candidates) => candidates
@@ -60,7 +66,9 @@ public static class CandidateRelevanceEvaluator
     {
         if (errorCodes.Status == ErrorCodeMatchStatus.Matched)
         {
-            return CandidateRelevanceTier.ErrorCodeMatch;
+            return ContradictsIntroduction(version)
+                ? CandidateRelevanceTier.ErrorCodeMatchChronologyConflict
+                : CandidateRelevanceTier.ErrorCodeMatch;
         }
 
         return version.Assessment switch
@@ -76,8 +84,11 @@ public static class CandidateRelevanceEvaluator
         CandidateRelevanceTier.ErrorCodeMatch => 0,
         CandidateRelevanceTier.VersionCompatible => 1,
         CandidateRelevanceTier.FeatureOnly => 2,
-        _ => 3,
+        CandidateRelevanceTier.ErrorCodeMatchChronologyConflict => 3,
+        _ => 4,
     };
+
+    private static bool ContradictsIntroduction(VersionSignal version) => version.IntroducedCheck == ReleaseBoundCheck.Inconsistent;
 
     private static int VersionRank(VersionCompatibility assessment) => assessment switch
     {

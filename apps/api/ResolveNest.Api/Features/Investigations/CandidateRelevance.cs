@@ -14,6 +14,9 @@ public enum CandidateRelevanceTier
     [JsonStringEnumMemberName("featureOnly")]
     FeatureOnly,
 
+    [JsonStringEnumMemberName("errorCodeMatchChronologyConflict")]
+    ErrorCodeMatchChronologyConflict,
+
     [JsonStringEnumMemberName("versionConflict")]
     VersionConflict,
 }

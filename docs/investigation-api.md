@@ -187,12 +187,19 @@ A `minor` report is never treated as a specific patch; it gets the `patchVersion
 
 | Tier | Rule |
 |---|---|
-| `errorCodeMatch` | `errorCodes.status` is `matched` |
+| `errorCodeMatch` | `errorCodes.status` is `matched` and `version.introducedCheck` is not `inconsistent` |
 | `versionCompatible` | No code match, version `withinDocumentedRange` or `indeterminate` |
 | `featureOnly` | No code match, version `noReleaseEvidence` or `reportedVersionUnknown` |
+| `errorCodeMatchChronologyConflict` | `errorCodes.status` is `matched`, but `version.introducedCheck` is `inconsistent`: the reported version is before the bug's documented introduction release |
 | `versionConflict` | No code match, version `outsideDocumentedRange` |
 
-An exact shared error code is the strongest diagnostic signal in this dataset, so it takes precedence even when the version conflicts; the conflict stays visible in `limitations`. Tiers are categories, not scores.
+An exact shared error code is the strongest diagnostic signal in this dataset, but it does not override a clear contradiction in the documented release chronology. A defect cannot normally appear in a release that predates the code that introduced it, so a code match whose reported version is before INTRODUCED_IN ranks below every candidate whose version is not contradicted, and above contradicted candidates without a code match. The response keeps both facts: `errorCodes.status` stays `matched`, the `errorCodeMatch` supporting note stays, and the contradiction is the **first** limitation (`errorCodeMatchContradictedByIntroduction`). Tiers are categories, not scores.
+
+Only a clear contradiction demotes a code match:
+- `introducedCheck` `inconsistent` needs a usable reported version entirely before the release. A patch report (`2.1.1` vs `2.2.0`) or a whole minor line (`2.1` vs `2.2.0`) qualifies.
+- A minor line that straddles the release (`2.2` vs `2.2.1`) is `indeterminate`, and Acme's `2.3` against BUG-231 (introduced 2.3.0, fixed 2.3.2) is `indeterminate` too. Both stay `errorCodeMatch`, with the tentative version note and `patchVersionUnknown`.
+- An unknown reported version (`latest`, null, unparseable) or missing release evidence never demotes: absence of evidence is not a contradiction.
+- A reported version at or after the documented **fix** keeps `errorCodeMatch`. The same error code on a version that should contain the fix is the classic sign of a regression or of a fix that was not deployed; it does not contradict that the defect exists. The `versionOutsideDocumentedRange` limitation still records it.
 
 ### Ordering rules
 
@@ -225,6 +232,7 @@ Every key is a value in the response, so a reader can recompute the order. The s
 | `noHistoricalConfirmations` | limitations | `confirmedTicketCount` = 0 |
 | `ticketHasConfirmedBug` | limitations | The target ticket already has a confirmed bug |
 | `ticketClosedWithoutConfirmedBug` | limitations | Ticket `resolved` or `closed` with no confirmed bug; its resolution may point to a non-product cause |
+| `errorCodeMatchContradictedByIntroduction` | limitations, always first | Tier is `errorCodeMatchChronologyConflict` |
 
 ### Example: Acme (verified 2026-11-03)
 
@@ -243,7 +251,7 @@ BUG-238 has more historical confirmations than BUG-233 but ranks lower, because 
 
 ### Secondary scenarios (verified)
 
-- **403, configuration (`ticket:TCK-1006`):** resolved, resolution `Configuration: token was missing the reports:read scope…`, no confirmed bug. BUG-244 is `errorCodeMatch` on `insufficient_scope` (the bug's text really cites it) but `outsideDocumentedRange` (introduced after 2.1.1). Every candidate carries `ticketClosedWithoutConfirmedBug`. The code match is shown as a reason to look, not as a product defect.
+- **403, configuration (`ticket:TCK-1006`):** resolved, resolution `Configuration: token was missing the reports:read scope…`, no confirmed bug. BUG-244's text really cites `insufficient_scope`, so `errorCodes.status` is `matched`, but the ticket reports 2.1.1 and BUG-244 was introduced in 2.2.0. It is therefore `errorCodeMatchChronologyConflict` with `errorCodeMatchContradictedByIntroduction` as its first limitation, and ranks third, after BUG-179 and BUG-187 (`versionCompatible`) and ahead of the seven `versionConflict` candidates. Before Task 2A it ranked first as `errorCodeMatch`. Every candidate carries `ticketClosedWithoutConfirmedBug`. Nothing is presented as a product defect.
 - **Webhook delay (`ticket:TCK-1043`):** no confirmed bug. BUG-247 is `featureOnly`, `confirmedTicketCount` 0, with `noErrorCodeInTicket`, `noReleaseEvidence` and `noHistoricalConfirmations`. The other webhook candidates are `versionConflict`.
 
 ## Markdown inclusion
@@ -281,7 +289,8 @@ It covers the Acme and TCK-1017 scenarios against independent count queries, 400
 
 - **No diagnosis:** relevance tiers explain evidence; they do not establish a cause. A human or a later grounded AI step must still decide.
 - **Narrow error-code coverage:** only `ERR_*` codes and quoted lowercase API codes are recognized. HTTP status codes and free-text symptoms ("times out", "0 KB file") are not compared, and a quoted lowercase snake-case word that is not really an error code would be treated as one.
-- **Error-code precedence:** a code match ranks first even when the version conflicts (BUG-244 for TCK-1006). The conflict is shown, not used to demote.
+- **Chronology rule is one-sided:** only a report before the documented introduction demotes a code match. A report at or after the fix does not, by design (see [Tiers](#tiers)). Neither rule knows about backports, release branches or hotfix lines, so a defect backported into an older line would be wrongly demoted.
+- **Demotion trusts the reported version:** a customer who misreports a patch version can push a real match into `errorCodeMatchChronologyConflict`. The candidate stays visible, and the first limitation says the version report may be wrong.
 - **Version assessment is per bound:** it checks the report against INTRODUCED_IN and FIXED_IN independently. It knows nothing about backports or release branches.
 - **Relevance runs after the limit:** the query keeps the 25 candidates with the most confirmations; a weak-history but strongly matching bug beyond that limit would not be seen. The current dataset has at most 15 candidates per ticket, so nothing is cut today.
 - **Candidate total unknown:** when 25 candidates are returned, the total beyond the limit is not known.
