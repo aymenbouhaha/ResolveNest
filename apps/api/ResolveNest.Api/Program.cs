@@ -1,6 +1,8 @@
 using Neo4j.Driver;
+using ResolveNest.Api.Features.Ingestion;
 
-var builder = WebApplication.CreateBuilder(args);
+var isSeedIngestion = SeedIngestionCommand.IsInvocation(args);
+var builder = WebApplication.CreateBuilder(isSeedIngestion ? [] : args);
 
 // Read Neo4j configuration
 var neo4jUri = builder.Configuration["Neo4j:Uri"]
@@ -20,7 +22,16 @@ builder.Services.AddSingleton<IDriver>(_ =>
     )
 );
 
+builder.Services.AddSeedIngestion(builder.Configuration);
+
 var app = builder.Build();
+
+if (isSeedIngestion)
+{
+    var exitCode = await SeedIngestionCommand.ExecuteAsync(app.Services, args);
+    await app.DisposeAsync();
+    return exitCode;
+}
 
 // Application health endpoint
 app.MapGet("/api/health", () =>
@@ -59,3 +70,4 @@ app.MapGet("/api/health/db", async (
 });
 
 app.Run();
+return 0;

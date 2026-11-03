@@ -1,0 +1,41 @@
+id,source_system,source_id,account_slug,name,plan,region,deployment,customer_since,synthetic
+customer:acme,synthetic-crm,ACC-0001,acme,Acme Corporation,enterprise,EU,dedicated,2024-03-18,true
+customer:brightline,synthetic-crm,ACC-0002,brightline,Brightline Health,enterprise,US,dedicated,2024-07-02,true
+customer:kestrel,synthetic-crm,ACC-0003,kestrel,Kestrel Freight,business,US,cloud,2025-01-14,true
+customer:lumen,synthetic-crm,ACC-0004,lumen,Lumen Analytics,business,EU,cloud,2025-02-27,true
+customer:orchard,synthetic-crm,ACC-0005,orchard,Orchard Retail Group,enterprise,UK,dedicated,2024-11-05,true
+customer:pinecrest,synthetic-crm,ACC-0006,pinecrest,Pinecrest Credit Union,enterprise,US,dedicated,2025-04-09,true
+customer:quillfield,synthetic-crm,ACC-0007,quillfield,Quillfield Media,starter,,cloud,2025-09-22,true
+customer:redwood,synthetic-crm,ACC-0008,redwood,Redwood Learning,business,APAC,cloud,2025-05-30,true
+customer:solano,synthetic-crm,ACC-0009,solano,Solano Energy,enterprise,US,dedicated,2024-09-16,true
+customer:tidewater,synthetic-crm,ACC-0010,tidewater,Tidewater Insurance,business,EU,cloud,2025-06-11,true
+customer:alder,synthetic-crm,ACC-0011,alder,Alder Manufacturing,business,EU,cloud,2023-02-06,true
+customer:basalt,synthetic-crm,ACC-0012,basalt,Basalt Energy Partners,enterprise,US,cloud,2023-02-27,true
+customer:cobalt,synthetic-crm,ACC-0013,cobalt,Cobalt Robotics,starter,UK,cloud,2023-03-20,true
+customer:driftwood,synthetic-crm,ACC-0014,driftwood,Driftwood Hospitality,business,APAC,cloud,2023-04-10,true
+customer:ember,synthetic-crm,ACC-0015,ember,Ember Foods,enterprise,US,dedicated,2023-05-01,true
+customer:fjord,synthetic-crm,ACC-0016,fjord,Fjord Shipping,business,EU,cloud,2023-05-22,true
+customer:granite,synthetic-crm,ACC-0017,granite,Granite Mutual,enterprise,LATAM,dedicated,2023-06-12,true
+customer:harbor,synthetic-crm,ACC-0018,harbor,Harbor Health Network,starter,EU,cloud,2023-07-03,true
+customer:iris,synthetic-crm,ACC-0019,iris,Iris Biotech,business,US,cloud,2023-07-24,true
+customer:juniper,synthetic-crm,ACC-0020,juniper,Juniper Schools,enterprise,UK,cloud,2023-08-14,true
+customer:kiln,synthetic-crm,ACC-0021,kiln,Kiln Ceramics Supply,business,APAC,cloud,2023-09-04,true
+customer:larch,synthetic-crm,ACC-0022,larch,Larch Property Group,enterprise,US,cloud,2023-09-25,true
+customer:meridian,synthetic-crm,ACC-0023,meridian,Meridian Travel,starter,,cloud,2023-10-16,true
+customer:nimbus,synthetic-crm,ACC-0024,nimbus,Nimbus Telecom,business,LATAM,cloud,2023-11-06,true
+customer:obsidian,synthetic-crm,ACC-0025,obsidian,Obsidian Security Services,enterprise,EU,dedicated,2023-11-27,true
+customer:prairie,synthetic-crm,ACC-0026,prairie,Prairie Farm Cooperative,business,US,cloud,2023-12-18,true
+customer:quarry,synthetic-crm,ACC-0027,quarry,Quarry Building Materials,enterprise,UK,dedicated,2024-01-08,true
+customer:ridgeway,synthetic-crm,ACC-0028,ridgeway,Ridgeway Transit,starter,APAC,cloud,2024-01-29,true
+customer:saffron,synthetic-crm,ACC-0029,saffron,Saffron Restaurants,business,US,cloud,2024-02-19,true
+customer:talon,synthetic-crm,ACC-0030,talon,Talon Aerospace,enterprise,EU,cloud,2024-03-11,true
+customer:umber,synthetic-crm,ACC-0031,umber,Umber Publishing,business,LATAM,cloud,2024-04-01,true
+customer:vantage,synthetic-crm,ACC-0032,vantage,Vantage Wealth,enterprise,EU,cloud,2024-04-22,true
+customer:willow,synthetic-crm,ACC-0033,willow,Willow Care Homes,starter,US,cloud,2024-05-13,true
+customer:yarrow,synthetic-crm,ACC-0034,yarrow,Yarrow Pharmacy,business,UK,cloud,2024-06-03,true
+customer:zephyr,synthetic-crm,ACC-0035,zephyr,Zephyr Air Cargo,enterprise,APAC,dedicated,2024-06-24,true
+customer:bramble,synthetic-crm,ACC-0036,bramble,Bramble Outdoor,business,US,cloud,2024-07-15,true
+customer:cinder,synthetic-crm,ACC-0037,cinder,Cinder Steelworks,enterprise,EU,dedicated,2024-08-05,true
+customer:delta-river,synthetic-crm,ACC-0038,delta-river,Delta River Utilities,starter,LATAM,cloud,2024-08-26,true
+customer:estuary,synthetic-crm,ACC-0039,estuary,Estuary Water Authority,business,EU,cloud,2024-09-16,true
+customer:foxglove,synthetic-crm,ACC-0040,foxglove,Foxglove Clinics,enterprise,US,cloud,2024-10-07,true

@@ -1,0 +1,13 @@
+id,source_system,source_id,name,area,description,synthetic
+feature:csv-export,synthetic-product-catalog,csv-export,CSV Export,reporting,Download report results as comma-separated files from the report viewer or as scheduled attachments.,true
+feature:pdf-export,synthetic-product-catalog,pdf-export,PDF Export,reporting,Render reports and dashboards as paginated PDF documents.,true
+feature:scheduled-reports,synthetic-product-catalog,scheduled-reports,Scheduled Reports,reporting,Run reports on a schedule and email the results as attachments.,true
+feature:dashboards,synthetic-product-catalog,dashboards,Dashboards,analytics,Interactive dashboards with widgets and filters backed by cached queries.,true
+feature:data-import,synthetic-product-catalog,data-import,Data Import,integrations,Upload CSV files to create or update records in bulk.,true
+feature:public-api,synthetic-product-catalog,public-api,Public REST API,integrations,Versioned REST API (/v2) for reading and writing account data.,true
+feature:api-tokens,synthetic-product-catalog,api-tokens,API Tokens and Scopes,security,Personal and service tokens with scoped permissions for API access.,true
+feature:sso-login,synthetic-product-catalog,sso-login,SSO Login (SAML),security,SAML 2.0 single sign-on and SCIM user provisioning.,true
+feature:user-roles,synthetic-product-catalog,user-roles,Roles and Permissions,security,"Custom roles that grant permissions on reports, exports and administration.",true
+feature:webhooks,synthetic-product-catalog,webhooks,Webhooks,integrations,Outbound HTTP event notifications with retries and delivery logs.,true
+feature:connector-sync,synthetic-product-catalog,connector-sync,Data Connectors,integrations,Scheduled synchronization of records from external CRM and ERP systems.,true
+feature:api-rate-limits,synthetic-product-catalog,api-rate-limits,API Rate Limits,integrations,Per-token and per-organization request quotas with 429 responses and rate limit headers.,true

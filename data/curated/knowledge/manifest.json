@@ -1,0 +1,478 @@
+{
+  "dataset": "resolvenest-synthetic-seed",
+  "synthetic": true,
+  "disclaimer": "Fictional knowledge-base articles for the ResolveNest demo. Ledgerline is a fictional product.",
+  "source_system": "synthetic-kb",
+  "exported_at": "2026-11-02T23:00:00Z",
+  "records": [
+    {
+      "id": "kb:KB-003",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-003",
+      "file": "KB-003-exporting-reports.md",
+      "title": "Exporting reports: CSV, XLSX and PDF",
+      "summary": "Export formats, permissions, column order and links to export troubleshooting articles.",
+      "feature_refs": [
+        "csv-export",
+        "pdf-export"
+      ],
+      "bug_refs": [],
+      "updated_at": "2026-08-04T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-005",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-005",
+      "file": "KB-005-configuring-saml-sso.md",
+      "title": "Configuring SAML single sign-on",
+      "summary": "SAML setup checklist, IdP user assignment, clock skew tolerance and SSO enforcement.",
+      "feature_refs": [
+        "sso-login"
+      ],
+      "bug_refs": [
+        "BUG-212"
+      ],
+      "updated_at": "2026-05-12T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-007",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-007",
+      "file": "KB-007-roles-and-permissions.md",
+      "title": "Roles and permissions reference",
+      "summary": "Built-in and custom roles, empty roles by design, and how roles limit API token scopes.",
+      "feature_refs": [
+        "user-roles",
+        "api-tokens"
+      ],
+      "bug_refs": [
+        "BUG-218"
+      ],
+      "updated_at": "2026-05-06T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-009",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-009",
+      "file": "KB-009-importing-csv-data.md",
+      "title": "Importing data from CSV files",
+      "summary": "Encoding requirements, UTF-8 BOM handling before 2.3.0 and the 99% progress display issue.",
+      "feature_refs": [
+        "data-import"
+      ],
+      "bug_refs": [
+        "BUG-215",
+        "BUG-228"
+      ],
+      "updated_at": "2026-07-14T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-011",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-011",
+      "file": "KB-011-scheduled-report-delivery.md",
+      "title": "Troubleshooting scheduled report delivery",
+      "summary": "Missing scheduled reports, dropped attachments over 10 MB and empty CSV attachments.",
+      "feature_refs": [
+        "scheduled-reports"
+      ],
+      "bug_refs": [
+        "BUG-222"
+      ],
+      "updated_at": "2026-08-04T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-012",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-012",
+      "file": "KB-012-csv-export-err-export-serialize.md",
+      "title": "Known issue: CSV export fails with ERR_EXPORT_SERIALIZE (2.3.0 and 2.3.1)",
+      "summary": "Symptoms, cause, 2.3.2 fix and XLSX workaround for CSV exports of reports with custom date fields.",
+      "feature_refs": [
+        "csv-export"
+      ],
+      "bug_refs": [
+        "BUG-231"
+      ],
+      "updated_at": "2026-08-04T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-014",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-014",
+      "file": "KB-014-large-exports-and-timeouts.md",
+      "title": "Large exports and timeouts",
+      "summary": "Export timeouts above about 500,000 rows and the asynchronous export API workaround.",
+      "feature_refs": [
+        "csv-export"
+      ],
+      "bug_refs": [
+        "BUG-238"
+      ],
+      "updated_at": "2026-07-20T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-015",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-015",
+      "file": "KB-015-api-403-token-scopes.md",
+      "title": "API returns HTTP 403: checking token scopes and permissions",
+      "summary": "403 error codes, required scopes per endpoint and the expired-token status code issue.",
+      "feature_refs": [
+        "public-api",
+        "api-tokens"
+      ],
+      "bug_refs": [
+        "BUG-244"
+      ],
+      "updated_at": "2026-08-19T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-016",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-016",
+      "file": "KB-016-api-ip-allowlists.md",
+      "title": "IP allowlists for API access",
+      "summary": "How API IP allowlists work and why requests from new servers return ip_not_allowed.",
+      "feature_refs": [
+        "public-api"
+      ],
+      "bug_refs": [],
+      "updated_at": "2026-06-18T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-018",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-018",
+      "file": "KB-018-webhook-delivery-delays.md",
+      "title": "Troubleshooting webhook delivery delays",
+      "summary": "Webhook dispatch, retry schedule, ordering and how to collect evidence for delayed deliveries.",
+      "feature_refs": [
+        "webhooks"
+      ],
+      "bug_refs": [],
+      "updated_at": "2026-08-19T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-020",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-020",
+      "file": "KB-020-api-rate-limits.md",
+      "title": "API rate limits and 429 responses",
+      "summary": "Plan limits, rate limit headers, Retry-After and common causes of 429 responses.",
+      "feature_refs": [
+        "api-rate-limits",
+        "public-api"
+      ],
+      "bug_refs": [
+        "BUG-173",
+        "BUG-203",
+        "BUG-251"
+      ],
+      "updated_at": "2026-10-13T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-021",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-021",
+      "file": "KB-021-connector-sync-delays.md",
+      "title": "Data connector sync schedules and delays",
+      "summary": "How connector sync polling works and how to diagnose delayed records.",
+      "feature_refs": [
+        "connector-sync"
+      ],
+      "bug_refs": [
+        "BUG-201",
+        "BUG-211"
+      ],
+      "updated_at": "2026-09-22T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-022",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-022",
+      "file": "KB-022-connector-authentication-errors.md",
+      "title": "Connector authentication errors",
+      "summary": "auth_failed and invalid_grant errors, reconnecting connectors and known retry issues.",
+      "feature_refs": [
+        "connector-sync"
+      ],
+      "bug_refs": [
+        "BUG-171",
+        "BUG-258"
+      ],
+      "updated_at": "2026-10-20T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-023",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-023",
+      "file": "KB-023-dashboard-performance.md",
+      "title": "Dashboard performance best practices",
+      "summary": "Widget limits, aggregated datasets and the 2.4.0 slow dashboard issue.",
+      "feature_refs": [
+        "dashboards"
+      ],
+      "bug_refs": [
+        "BUG-257"
+      ],
+      "updated_at": "2026-10-27T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-024",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-024",
+      "file": "KB-024-api-pagination.md",
+      "title": "Paginating large API result sets",
+      "summary": "Cursor versus offset pagination and historical pagination defects.",
+      "feature_refs": [
+        "public-api"
+      ],
+      "bug_refs": [
+        "BUG-163",
+        "BUG-224"
+      ],
+      "updated_at": "2026-06-23T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-025",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-025",
+      "file": "KB-025-mfa-troubleshooting.md",
+      "title": "Multi-factor authentication troubleshooting",
+      "summary": "Rejected codes, lost devices, MFA loops and SSO double prompts.",
+      "feature_refs": [
+        "sso-login"
+      ],
+      "bug_refs": [
+        "BUG-185"
+      ],
+      "updated_at": "2026-03-03T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-026",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-026",
+      "file": "KB-026-scheduled-report-run-history.md",
+      "title": "Reading scheduled report run history",
+      "summary": "Run statuses, deactivated schedule owners and duplicate or stale runs.",
+      "feature_refs": [
+        "scheduled-reports"
+      ],
+      "bug_refs": [
+        "BUG-165",
+        "BUG-206",
+        "BUG-255"
+      ],
+      "updated_at": "2026-10-27T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-027",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-027",
+      "file": "KB-027-webhook-signatures.md",
+      "title": "Verifying webhook signatures",
+      "summary": "HMAC signature verification and signing secret rotation.",
+      "feature_refs": [
+        "webhooks"
+      ],
+      "bug_refs": [
+        "BUG-213"
+      ],
+      "updated_at": "2026-09-22T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-028",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-028",
+      "file": "KB-028-webhook-endpoint-checklist.md",
+      "title": "Webhook endpoint configuration checklist",
+      "summary": "HTTPS, response time, firewall and subscription checks for webhook receivers.",
+      "feature_refs": [
+        "webhooks"
+      ],
+      "bug_refs": [
+        "BUG-167"
+      ],
+      "updated_at": "2026-02-10T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-029",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-029",
+      "file": "KB-029-rotating-api-tokens.md",
+      "title": "Rotating API tokens safely",
+      "summary": "Step-by-step token rotation and the last-used timestamp limitation.",
+      "feature_refs": [
+        "api-tokens"
+      ],
+      "bug_refs": [
+        "BUG-179"
+      ],
+      "updated_at": "2026-08-19T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-030",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-030",
+      "file": "KB-030-scim-provisioning.md",
+      "title": "SCIM provisioning troubleshooting",
+      "summary": "SCIM token and group mapping checks and provisioning-related defects.",
+      "feature_refs": [
+        "sso-login",
+        "user-roles"
+      ],
+      "bug_refs": [
+        "BUG-240",
+        "BUG-260"
+      ],
+      "updated_at": "2026-10-27T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-031",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-031",
+      "file": "KB-031-csv-delimiters-regional-settings.md",
+      "title": "CSV delimiters and regional settings",
+      "summary": "Semicolon delimiters, UTF-8 with BOM and other CSV configuration settings.",
+      "feature_refs": [
+        "csv-export"
+      ],
+      "bug_refs": [
+        "BUG-159"
+      ],
+      "updated_at": "2026-08-04T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-032",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-032",
+      "file": "KB-032-pdf-export-layout.md",
+      "title": "PDF export layout tips",
+      "summary": "Orientation, margins and PDF layout defects by version.",
+      "feature_refs": [
+        "pdf-export"
+      ],
+      "bug_refs": [
+        "BUG-175",
+        "BUG-204",
+        "BUG-214"
+      ],
+      "updated_at": "2026-10-13T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-033",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-033",
+      "file": "KB-033-data-import-validation-errors.md",
+      "title": "Data import validation errors reference",
+      "summary": "Common import validation errors and known import defects.",
+      "feature_refs": [
+        "data-import"
+      ],
+      "bug_refs": [
+        "BUG-157",
+        "BUG-183",
+        "BUG-259"
+      ],
+      "updated_at": "2026-10-20T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-034",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-034",
+      "file": "KB-034-report-sharing-permissions.md",
+      "title": "Sharing reports and folder permissions",
+      "summary": "Folder membership, role permissions and 403 responses for shared reports.",
+      "feature_refs": [
+        "user-roles",
+        "public-api"
+      ],
+      "bug_refs": [
+        "BUG-210",
+        "BUG-253"
+      ],
+      "updated_at": "2026-10-13T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-035",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-035",
+      "file": "KB-035-dashboard-filters-dates.md",
+      "title": "Dashboard filters, dates and drill-down",
+      "summary": "Timezone handling, filter persistence and truncated filter values.",
+      "feature_refs": [
+        "dashboards"
+      ],
+      "bug_refs": [
+        "BUG-177",
+        "BUG-209",
+        "BUG-254"
+      ],
+      "updated_at": "2026-09-30T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-036",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-036",
+      "file": "KB-036-known-issues-2-4.md",
+      "title": "Known issues in Ledgerline 2.4",
+      "summary": "Open issues in the 2.4 release line with workarounds.",
+      "feature_refs": [
+        "dashboards",
+        "scheduled-reports",
+        "csv-export"
+      ],
+      "bug_refs": [
+        "BUG-242",
+        "BUG-249",
+        "BUG-261"
+      ],
+      "updated_at": "2026-10-30T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-037",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-037",
+      "file": "KB-037-connector-field-mapping.md",
+      "title": "Connector field mapping errors",
+      "summary": "Fixing mapping_error results after source fields are renamed.",
+      "feature_refs": [
+        "connector-sync"
+      ],
+      "bug_refs": [
+        "BUG-181"
+      ],
+      "updated_at": "2026-04-14T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-038",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-038",
+      "file": "KB-038-saml-certificate-rotation.md",
+      "title": "Rotating the SAML signing certificate",
+      "summary": "Safe IdP certificate rotation and invalid signature errors.",
+      "feature_refs": [
+        "sso-login"
+      ],
+      "bug_refs": [
+        "BUG-161"
+      ],
+      "updated_at": "2026-01-13T12:00:00Z"
+    },
+    {
+      "id": "kb:KB-039",
+      "source_system": "synthetic-kb",
+      "source_id": "KB-039",
+      "file": "KB-039-asynchronous-export-api.md",
+      "title": "Asynchronous export API",
+      "summary": "Creating, polling and downloading large exports through the API.",
+      "feature_refs": [
+        "csv-export",
+        "public-api"
+      ],
+      "bug_refs": [],
+      "updated_at": "2026-07-20T12:00:00Z"
+    }
+  ]
+}

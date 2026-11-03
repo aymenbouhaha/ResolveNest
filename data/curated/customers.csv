@@ -1,0 +1,11 @@
+id,source_system,source_id,account_slug,name,plan,region,deployment,customer_since,synthetic
+customer:acme,synthetic-crm,ACC-0001,acme,Acme Corporation,enterprise,EU,dedicated,2024-03-18,true
+customer:brightline,synthetic-crm,ACC-0002,brightline,Brightline Health,enterprise,US,dedicated,2024-07-02,true
+customer:kestrel,synthetic-crm,ACC-0003,kestrel,Kestrel Freight,business,US,cloud,2025-01-14,true
+customer:lumen,synthetic-crm,ACC-0004,lumen,Lumen Analytics,business,EU,cloud,2025-02-27,true
+customer:orchard,synthetic-crm,ACC-0005,orchard,Orchard Retail Group,enterprise,UK,dedicated,2024-11-05,true
+customer:pinecrest,synthetic-crm,ACC-0006,pinecrest,Pinecrest Credit Union,enterprise,US,dedicated,2025-04-09,true
+customer:quillfield,synthetic-crm,ACC-0007,quillfield,Quillfield Media,starter,,cloud,2025-09-22,true
+customer:redwood,synthetic-crm,ACC-0008,redwood,Redwood Learning,business,APAC,cloud,2025-05-30,true
+customer:solano,synthetic-crm,ACC-0009,solano,Solano Energy,enterprise,US,dedicated,2024-09-16,true
+customer:tidewater,synthetic-crm,ACC-0010,tidewater,Tidewater Insurance,business,EU,cloud,2025-06-11,true

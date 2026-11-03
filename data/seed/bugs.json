@@ -1,0 +1,1156 @@
+{
+  "dataset": "resolvenest-synthetic-seed",
+  "synthetic": true,
+  "disclaimer": "Fictional records for the ResolveNest demo. Not real product, customer or defect data.",
+  "source_system": "synthetic-issue-tracker",
+  "exported_at": "2026-11-02T23:00:00Z",
+  "records": [
+    {
+      "id": "bug:BUG-151",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-151",
+      "title": "Dashboard image export fails for charts with more than 1,000 points",
+      "description": "Exporting a dashboard as PNG fails with 'Render timeout' when any line chart has more than 1,000 data points.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "dashboards"
+      ],
+      "introduced_in": "1.9.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v1.9.0.",
+      "fixed_in": "1.9.1",
+      "fix_evidence": "Fix listed in the v1.9.1 release notes.",
+      "workaround": "Aggregate the chart by week before exporting.",
+      "created_at": "2025-07-16T10:00:00Z",
+      "updated_at": "2025-08-19T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-153",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-153",
+      "title": "Scheduled report subject line drops non-ASCII characters",
+      "description": "Accented and non-Latin characters in scheduled report email subjects are replaced with question marks.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "scheduled-reports"
+      ],
+      "introduced_in": "1.9.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v1.9.0.",
+      "fixed_in": "2.0.0",
+      "fix_evidence": "Fix listed in the v2.0.0 release notes.",
+      "workaround": "Use ASCII characters in the subject template.",
+      "created_at": "2025-07-17T10:00:00Z",
+      "updated_at": "2025-09-23T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-155",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-155",
+      "title": "API returns 500 when a filter value contains a comma",
+      "description": "GET requests with filter values containing an unescaped comma fail with HTTP 500 instead of being parsed or rejected with 400.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "public-api"
+      ],
+      "introduced_in": "1.9.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v1.9.0.",
+      "fixed_in": "2.0.1",
+      "fix_evidence": "Fix listed in the v2.0.1 release notes.",
+      "workaround": "Percent-encode commas in filter values.",
+      "created_at": "2025-07-18T10:00:00Z",
+      "updated_at": "2025-10-21T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-157",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-157",
+      "title": "Import silently truncates text fields longer than 255 characters",
+      "description": "Text values longer than 255 characters are cut off during import without a warning in the import summary.",
+      "status": "fixed",
+      "severity": "high",
+      "feature_refs": [
+        "data-import"
+      ],
+      "introduced_in": null,
+      "introduced_in_evidence": null,
+      "fixed_in": "2.0.0",
+      "fix_evidence": "Fix listed in the v2.0.0 release notes.",
+      "workaround": "Split long notes into multiple fields before importing.",
+      "created_at": "2025-08-29T10:00:00Z",
+      "updated_at": "2025-09-23T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-159",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-159",
+      "title": "CSV export escapes quotes incorrectly in multi-line text fields",
+      "description": "Double quotes inside multi-line text values are not doubled, so spreadsheet tools split the row into several broken rows.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "csv-export"
+      ],
+      "introduced_in": "1.9.1",
+      "introduced_in_evidence": "Regression traced to changes shipped in v1.9.1.",
+      "fixed_in": "2.0.2",
+      "fix_evidence": "Fix listed in the v2.0.2 release notes.",
+      "workaround": "Export as XLSX for reports with multi-line notes.",
+      "created_at": "2025-08-21T10:00:00Z",
+      "updated_at": "2025-11-25T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-161",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-161",
+      "title": "SAML signing certificate rollover not applied until the next deploy",
+      "description": "A newly uploaded IdP certificate is stored but not used for signature validation until the application is redeployed, so sign-ins fail after the IdP switches certificates.",
+      "status": "fixed",
+      "severity": "high",
+      "feature_refs": [
+        "sso-login"
+      ],
+      "introduced_in": "2.0.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.0.",
+      "fixed_in": "2.0.3",
+      "fix_evidence": "Fix listed in the v2.0.3 release notes.",
+      "workaround": "Keep the IdP on the old certificate until support confirms the reload.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2026-01-13T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-163",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-163",
+      "title": "Offset pagination skips records when sorting by updated_at",
+      "description": "Records updated while an integration pages through /v2/records with sort=updated_at move between pages and are skipped.",
+      "status": "fixed",
+      "severity": "high",
+      "feature_refs": [
+        "public-api"
+      ],
+      "introduced_in": "2.0.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.0.",
+      "fixed_in": "2.0.2",
+      "fix_evidence": "Fix listed in the v2.0.2 release notes.",
+      "workaround": "Sort by id when paginating with offsets.",
+      "created_at": "2025-09-24T10:00:00Z",
+      "updated_at": "2025-11-25T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-165",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-165",
+      "title": "Scheduled report fails when the schedule owner is deactivated",
+      "description": "Schedules owned by a deactivated user fail with status failed_owner and no notification is sent to administrators.",
+      "status": "open",
+      "severity": "medium",
+      "feature_refs": [
+        "scheduled-reports"
+      ],
+      "introduced_in": "2.0.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.0.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Transfer schedules to an active user before deactivating the owner. See KB-026.",
+      "created_at": "2025-09-25T10:00:00Z",
+      "updated_at": "2025-11-01T10:00:00Z"
+    },
+    {
+      "id": "bug:BUG-167",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-167",
+      "title": "Webhook test button always reports success",
+      "description": "The webhook test console shows 'Delivered' even when the receiver returns an error or the request times out.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "webhooks"
+      ],
+      "introduced_in": "2.0.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.0.",
+      "fixed_in": "2.0.1",
+      "fix_evidence": "Fix listed in the v2.0.1 release notes.",
+      "workaround": "Check the delivery log for the real response code.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2025-10-21T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-169",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-169",
+      "title": "Role changes take up to 10 minutes to apply",
+      "description": "Permission changes on a role are cached for up to 10 minutes, so users keep their old access until the cache expires.",
+      "status": "wontfix",
+      "severity": "low",
+      "feature_refs": [
+        "user-roles"
+      ],
+      "introduced_in": "2.0.1",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.1.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Product decision: permission cache TTL is intentional for performance. Ask users to sign out and in again.",
+      "created_at": "2025-10-22T10:00:00Z",
+      "updated_at": "2025-10-29T10:00:00Z"
+    },
+    {
+      "id": "bug:BUG-171",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-171",
+      "title": "Connector sync stalls after OAuth token refresh",
+      "description": "After the source system's OAuth access token is refreshed, the connector keeps using the expired token and every run stays in running state.",
+      "status": "fixed",
+      "severity": "high",
+      "feature_refs": [
+        "connector-sync"
+      ],
+      "introduced_in": "2.0.2",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.2.",
+      "fixed_in": "2.1.0",
+      "fix_evidence": "Fix listed in the v2.1.0 release notes.",
+      "workaround": "Disable and re-enable the connector. See KB-022.",
+      "created_at": "2025-11-27T10:00:00Z",
+      "updated_at": "2026-02-10T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-173",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-173",
+      "title": "Rate limit counter not reset at window boundary for burst requests",
+      "description": "Bursts of requests at the end of a rate limit window are counted in the next window as well, causing unexpected 429 responses.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "api-rate-limits"
+      ],
+      "introduced_in": "2.0.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.0.",
+      "fixed_in": " 2.0.3",
+      "fix_evidence": "Fix listed in the v2.0.3 release notes.",
+      "workaround": "Spread requests evenly across the minute.",
+      "created_at": "2025-09-26T10:00:00Z",
+      "updated_at": "2026-01-13T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-175",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-175",
+      "title": "PDF export ignores report page margins",
+      "description": "Custom page margins set in the report print layout are ignored and the default 10 mm margins are used.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "pdf-export"
+      ],
+      "introduced_in": "2.0.1",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.1.",
+      "fixed_in": "2.1.0",
+      "fix_evidence": "Fix listed in the v2.1.0 release notes.",
+      "workaround": "Adjust column widths instead of margins.",
+      "created_at": "2025-10-22T10:00:00Z",
+      "updated_at": "2026-02-10T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-177",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-177",
+      "title": "Dashboard date picker defaults to UTC instead of the workspace timezone",
+      "description": "The default date range on dashboards is computed in UTC, so 'Today' starts at the wrong hour for non-UTC workspaces.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "dashboards"
+      ],
+      "introduced_in": "2.0.2",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.2.",
+      "fixed_in": "2.1.1",
+      "fix_evidence": "Fix listed in the v2.1.1 release notes.",
+      "workaround": "Select explicit dates instead of relative ranges.",
+      "created_at": "2025-11-27T10:00:00Z",
+      "updated_at": "2026-03-03T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-179",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-179",
+      "title": "Token last-used timestamp not updated for read-only requests",
+      "description": "The Last used column in Settings > API Tokens only changes when a token performs a write request.",
+      "status": "open",
+      "severity": "low",
+      "feature_refs": [
+        "api-tokens"
+      ],
+      "introduced_in": "2.0.3",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.3.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Use the API audit log to check read activity. See KB-029.",
+      "created_at": "2026-01-16T10:00:00Z",
+      "updated_at": "2026-03-01T10:00:00Z"
+    },
+    {
+      "id": "bug:BUG-181",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-181",
+      "title": "Connector field mapping lost after renaming a source column",
+      "description": "Renaming a column in the source system removes its field mapping, so the target field stays empty on every following sync.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "connector-sync"
+      ],
+      "introduced_in": "2.0",
+      "introduced_in_evidence": "Reported against the 2.0 line; the exact patch version was not recorded.",
+      "fixed_in": "2.2.0",
+      "fix_evidence": "Fix listed in the v2.2.0 release notes.",
+      "workaround": "Remap the field after renaming. See KB-037.",
+      "created_at": "2025-12-02T10:00:00Z",
+      "updated_at": "2026-04-14T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-183",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-183",
+      "title": "Import preview shows wrong row numbers for files with blank lines",
+      "description": "Blank lines are skipped when counting rows, so validation errors in the preview point to the wrong row numbers.",
+      "status": "open",
+      "severity": "low",
+      "feature_refs": [
+        "data-import"
+      ],
+      "introduced_in": null,
+      "introduced_in_evidence": null,
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Remove blank lines before importing.",
+      "created_at": "2026-09-10T10:00:00Z",
+      "updated_at": "2026-10-26T10:00:00Z"
+    },
+    {
+      "id": "bug:BUG-185",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-185",
+      "title": "MFA prompt loops in Safari private browsing",
+      "description": "In Safari private windows, the MFA challenge reappears after a correct code because the session cookie cannot be stored.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "sso-login"
+      ],
+      "introduced_in": "2.1.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.1.0.",
+      "fixed_in": "2.1.1",
+      "fix_evidence": "Fix listed in the v2.1.1 release notes.",
+      "workaround": "Use a normal browser window. See KB-025.",
+      "created_at": "2026-02-13T10:00:00Z",
+      "updated_at": "2026-03-03T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-187",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-187",
+      "title": "API ignores If-None-Match for /v2/reports",
+      "description": "Conditional GET requests with If-None-Match always return 200 with a full body instead of 304.",
+      "status": "open",
+      "severity": "low",
+      "feature_refs": [
+        "public-api"
+      ],
+      "introduced_in": "2.1.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.1.0.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": null,
+      "created_at": "2026-02-11T10:00:00Z",
+      "updated_at": "2026-03-31T10:00:00Z"
+    },
+    {
+      "id": "bug:BUG-189",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-189",
+      "title": "Webhook delivery log shows response time in the wrong unit",
+      "description": "The delivery log labels response times as milliseconds while the values are microseconds.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "webhooks"
+      ],
+      "introduced_in": "2.0.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.0.0.",
+      "fixed_in": "2.2.1",
+      "fix_evidence": "Fix listed in the v2.2.1 release notes.",
+      "workaround": "Divide the displayed value by 1,000.",
+      "created_at": "2025-09-25T10:00:00Z",
+      "updated_at": "2026-05-12T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-201",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-201",
+      "title": "Incremental sync re-imports all rows after a daylight-saving change",
+      "description": "On the night of a daylight-saving transition the incremental sync cursor is reset and the connector re-imports every record.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "connector-sync"
+      ],
+      "introduced_in": "2.2.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.2.0.",
+      "fixed_in": "2.3.0",
+      "fix_evidence": "Fix listed in the v2.3.0 release notes.",
+      "workaround": "Pause connectors during the daylight-saving transition.",
+      "created_at": "2026-04-17T10:00:00Z",
+      "updated_at": "2026-06-23T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-202",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-202",
+      "title": "Dashboard share links expire after 24 hours instead of 30 days",
+      "description": "Public share links created on 2.2.0 expire after one day although the dialog says 30 days.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "dashboards"
+      ],
+      "introduced_in": "2.2.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.2.0.",
+      "fixed_in": "2.2.1",
+      "fix_evidence": "Fix listed in the v2.2.1 release notes.",
+      "workaround": "Recreate the share link daily.",
+      "created_at": "2026-04-15T10:00:00Z",
+      "updated_at": "2026-05-12T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-203",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-203",
+      "title": "429 responses missing the Retry-After header",
+      "description": "Rate-limited requests receive 429 without a Retry-After header, so clients retry immediately and stay throttled.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "api-rate-limits"
+      ],
+      "introduced_in": "2.2.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.2.0.",
+      "fixed_in": "2.3.1",
+      "fix_evidence": "Fix listed in the v2.3.1 release notes.",
+      "workaround": "Back off for 60 seconds after a 429. See KB-020.",
+      "created_at": "2026-04-16T10:00:00Z",
+      "updated_at": "2026-07-14T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-204",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-204",
+      "title": "PDF export truncates tables wider than the page",
+      "description": "Reports with more than 12 columns lose the right-most columns when exported to PDF. The new layout engine does not wrap or scale wide tables.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "pdf-export"
+      ],
+      "introduced_in": "2.1.0",
+      "introduced_in_evidence": "Regression traced to the PDF layout engine shipped in v2.1.0.",
+      "fixed_in": "2.1.1",
+      "fix_evidence": "Fix merged in PR-3982 and listed in the v2.1.1 release notes.",
+      "workaround": "Switch the PDF page orientation to landscape or hide unused columns before exporting.",
+      "created_at": "2026-02-18T10:12:00Z",
+      "updated_at": "2026-03-03T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-205",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-205",
+      "title": "CSV export uses the browser timezone instead of the report timezone for timestamps",
+      "description": "Timestamp columns in CSV exports are converted to the downloading user's browser timezone instead of the report's configured timezone.",
+      "status": "open",
+      "severity": "low",
+      "feature_refs": [
+        "csv-export"
+      ],
+      "introduced_in": "2.2.1",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.2.1.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Set the report timezone to match the users' timezone.",
+      "created_at": "2026-05-15T10:00:00Z",
+      "updated_at": "2026-06-17T10:00:00Z"
+    },
+    {
+      "id": "bug:BUG-206",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-206",
+      "title": "Scheduled report runs twice when edited during execution",
+      "description": "Saving a schedule while its run is in progress queues an additional run with the new settings.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "scheduled-reports"
+      ],
+      "introduced_in": "2.2.1",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.2.1.",
+      "fixed_in": "2.3.1",
+      "fix_evidence": "Fix listed in the v2.3.1 release notes.",
+      "workaround": "Edit schedules only between runs.",
+      "created_at": "2026-05-13T10:00:00Z",
+      "updated_at": "2026-07-14T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-207",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-207",
+      "title": "Scheduled reports delivered twice on daylight-saving transitions",
+      "description": "On the night a timezone switches to or from daylight-saving time, scheduled reports set to run at 01:00-03:00 local time are executed twice.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "scheduled-reports"
+      ],
+      "introduced_in": null,
+      "introduced_in_evidence": null,
+      "fixed_in": "2.2.0",
+      "fix_evidence": "Scheduler now stores run times in UTC. Listed in the v2.2.0 release notes.",
+      "workaround": "Schedule reports outside the 01:00-03:00 local window.",
+      "created_at": "2026-03-31T08:40:00Z",
+      "updated_at": "2026-04-14T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-208",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-208",
+      "title": "Bulk role assignment fails for more than 500 users",
+      "description": "Assigning a role to more than 500 selected users fails with 'Request too large' and no users are updated.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "user-roles"
+      ],
+      "introduced_in": "2.3.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.3.0.",
+      "fixed_in": "2.4.0",
+      "fix_evidence": "Fix listed in the v2.4.0 release notes.",
+      "workaround": "Assign roles in batches of 500.",
+      "created_at": "2026-06-25T10:00:00Z",
+      "updated_at": "2026-09-22T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-209",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-209",
+      "title": "Dashboard filters reset after browser back navigation",
+      "description": "Applying dashboard filters, opening a widget drill-down and pressing the browser back button resets all filters to their defaults.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "dashboards"
+      ],
+      "introduced_in": "2.1.0",
+      "introduced_in_evidence": "Introduced by the filter panel redesign in v2.1.0.",
+      "fixed_in": "2.2.1",
+      "fix_evidence": "Filter state is now persisted in the URL. Listed in the v2.2.1 release notes.",
+      "workaround": "Open drill-downs in a new tab.",
+      "created_at": "2026-03-17T14:05:00Z",
+      "updated_at": "2026-05-12T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-210",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-210",
+      "title": "API returns 404 instead of 403 for reports in restricted folders",
+      "description": "GET /v2/reports/{id} returns 404 Not Found when the caller lacks folder access, which hides the real permission problem.",
+      "status": "open",
+      "severity": "low",
+      "feature_refs": [
+        "public-api",
+        "user-roles"
+      ],
+      "introduced_in": "2.3.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.3.0.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Check folder membership when a known report returns 404. See KB-034.",
+      "created_at": "2026-06-26T10:00:00Z",
+      "updated_at": "2026-08-01T10:00:00Z"
+    },
+    {
+      "id": "bug:BUG-211",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-211",
+      "title": "Sync status shows Completed while the last batch is still running",
+      "description": "The connector run is marked Completed before its final batch commits, so records appear a few minutes after the run ends.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "connector-sync"
+      ],
+      "introduced_in": "2.3.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.3.0.",
+      "fixed_in": "2.4.0",
+      "fix_evidence": "Fix listed in the v2.4.0 release notes.",
+      "workaround": "Wait five minutes after a run completes before checking records.",
+      "created_at": "2026-06-24T10:00:00Z",
+      "updated_at": "2026-09-22T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-212",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-212",
+      "title": "SAML login loops when the IdP clock is ahead by more than 2 minutes",
+      "description": "The SAML assertion validator applied zero tolerance to NotBefore, so users were redirected back to the IdP repeatedly when the IdP clock was slightly ahead.",
+      "status": "fixed",
+      "severity": "high",
+      "feature_refs": [
+        "sso-login"
+      ],
+      "introduced_in": null,
+      "introduced_in_evidence": null,
+      "fixed_in": "2.2.1",
+      "fix_evidence": "A 3-minute clock skew tolerance was added. Listed in the v2.2.1 release notes.",
+      "workaround": "Synchronize the IdP server clock with NTP.",
+      "created_at": "2026-03-10T11:30:00Z",
+      "updated_at": "2026-05-12T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-213",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-213",
+      "title": "Webhook signing secret rotation invalidates the old secret immediately",
+      "description": "Rotating an endpoint's signing secret invalidates the previous secret at once, so receivers reject deliveries until they are updated.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "webhooks"
+      ],
+      "introduced_in": "2.3.1",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.3.1.",
+      "fixed_in": "2.4.0",
+      "fix_evidence": "Fix listed in the v2.4.0 release notes.",
+      "workaround": "Update the receiver immediately after rotating. See KB-027.",
+      "created_at": "2026-07-16T10:00:00Z",
+      "updated_at": "2026-09-22T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-214",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-214",
+      "title": "PDF export of dashboards omits the last widget row",
+      "description": "When a dashboard is exported to PDF, the bottom row of widgets is missing if the dashboard height is not a multiple of the page height.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "pdf-export",
+        "dashboards"
+      ],
+      "introduced_in": "2.3.1",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.3.1.",
+      "fixed_in": "2.4.1",
+      "fix_evidence": "Fix listed in the v2.4.1 release notes.",
+      "workaround": "Add an empty text widget at the bottom of the dashboard.",
+      "created_at": "2026-07-17T10:00:00Z",
+      "updated_at": "2026-10-13T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-215",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-215",
+      "title": "Data import rejects CSV files saved with a UTF-8 byte-order mark",
+      "description": "Files exported from spreadsheet tools with a UTF-8 BOM fail validation because the first header is read as '\\ufeffaccount_id'.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "data-import"
+      ],
+      "introduced_in": "2.2",
+      "introduced_in_evidence": "Reporter states the problem started on the 2.2 line; the exact patch version was never recorded.",
+      "fixed_in": "2.3.0",
+      "fix_evidence": "BOM stripping added to the rewritten import pipeline. Listed in the v2.3.0 release notes.",
+      "workaround": "Save the file as 'CSV (comma delimited)' without BOM.",
+      "created_at": "2026-04-22T09:15:00Z",
+      "updated_at": "2026-06-23T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-218",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-218",
+      "title": "Role editor allows saving a role with no permissions",
+      "description": "Custom roles can be saved with an empty permission set. Users assigned to such a role can sign in but see a blank workspace.",
+      "status": "wontfix",
+      "severity": "low",
+      "feature_refs": [
+        "user-roles"
+      ],
+      "introduced_in": "2.2.0",
+      "introduced_in_evidence": "Custom role editor first shipped in v2.2.0.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Product decision: empty roles are allowed for staged onboarding. Documented in KB-007.",
+      "created_at": "2026-04-29T13:20:00Z",
+      "updated_at": "2026-05-06T10:00:00Z"
+    },
+    {
+      "id": "bug:BUG-219",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-219",
+      "title": "Dashboard widgets show stale cached results for up to 15 minutes",
+      "description": "Widget query cache is not invalidated when the underlying dataset refreshes, so figures can lag the source data by up to 15 minutes.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "dashboards"
+      ],
+      "introduced_in": "2.2.0",
+      "introduced_in_evidence": "Cache layer introduced in v2.2.0.",
+      "fixed_in": "2.3.1",
+      "fix_evidence": "Cache invalidation on dataset refresh. Listed in the v2.3.1 release notes.",
+      "workaround": "Use the widget menu 'Refresh now'.",
+      "created_at": "2026-06-12T08:50:00Z",
+      "updated_at": "2026-07-14T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-222",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-222",
+      "title": "Scheduled report emails omit attachments larger than 10 MB",
+      "description": "When a scheduled report attachment exceeds 10 MB the email is sent without the attachment and without an error message.",
+      "status": "open",
+      "severity": "medium",
+      "feature_refs": [
+        "scheduled-reports"
+      ],
+      "introduced_in": "2.2.1",
+      "introduced_in_evidence": "Mail relay size limit introduced with the email provider change in v2.2.1.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Enable 'Send as download link' in the schedule settings.",
+      "created_at": "2026-06-03T15:00:00Z",
+      "updated_at": "2026-10-20T11:00:00Z"
+    },
+    {
+      "id": "bug:BUG-224",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-224",
+      "title": "API cursor pagination returns duplicate rows",
+      "description": "Paginating /v2/transactions with a page size above 200 can return the last row of one page again as the first row of the next page.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "public-api"
+      ],
+      "introduced_in": "2.2.0",
+      "introduced_in_evidence": "Cursor pagination introduced in v2.2.0.",
+      "fixed_in": "2.3.0",
+      "fix_evidence": "Cursor now encodes a tiebreaker column. Listed in the v2.3.0 release notes.",
+      "workaround": "Use page sizes of 200 or less, or de-duplicate by transaction id.",
+      "created_at": "2026-05-20T10:10:00Z",
+      "updated_at": "2026-06-23T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-226",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-226",
+      "title": "PDF export renders non-Latin characters as empty boxes",
+      "description": "Japanese, Thai and Arabic text is rendered as placeholder boxes in PDF exports because the fallback font set is missing.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "pdf-export"
+      ],
+      "introduced_in": "2.3.0",
+      "introduced_in_evidence": "Font bundle trimmed during the v2.3.0 build size reduction.",
+      "fixed_in": "2.4.0",
+      "fix_evidence": "Noto fallback fonts restored. Listed in the v2.4.0 release notes.",
+      "workaround": "Export as XLSX and print from a spreadsheet tool.",
+      "created_at": "2026-07-03T09:30:00Z",
+      "updated_at": "2026-09-22T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-228",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-228",
+      "title": "Data import progress bar stuck at 99%",
+      "description": "The import completes in the background but the progress bar never reaches 100% and the summary screen is not shown.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "data-import"
+      ],
+      "introduced_in": "2.3.0",
+      "introduced_in_evidence": "Introduced by the import pipeline rewrite in v2.3.0.",
+      "fixed_in": "2.3.1",
+      "fix_evidence": "Completion event now emitted after the final batch. Listed in the v2.3.1 release notes.",
+      "workaround": "Reload the import history page to see the completed import.",
+      "created_at": "2026-06-30T12:00:00Z",
+      "updated_at": "2026-07-14T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-231",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-231",
+      "title": "CSV export fails with ERR_EXPORT_SERIALIZE when a report contains custom date fields",
+      "description": "The streaming CSV serializer introduced in 2.3.0 throws on custom date fields that have a null value or a non-ISO display format. The export is aborted, the user sees 'Export failed (ERR_EXPORT_SERIALIZE)' and the downloaded file is 0 bytes. Scheduled reports that attach CSV files send an empty attachment. XLSX and PDF exports are not affected.",
+      "status": "fixed",
+      "severity": "high",
+      "feature_refs": [
+        "csv-export",
+        "scheduled-reports"
+      ],
+      "introduced_in": "2.3.0",
+      "introduced_in_evidence": "Regression bisected to the streaming CSV export engine shipped in v2.3.0 (PR-4471).",
+      "fixed_in": "2.3.2",
+      "fix_evidence": "Fix merged in PR-5120: null-safe date formatting in the CSV serializer. Shipped in v2.3.2 and listed in its release notes. Verified by QA on 2026-08-03.",
+      "workaround": "Export the report as XLSX, or remove custom date columns from the report before exporting to CSV. See KB-012.",
+      "created_at": "2026-06-29T16:20:00Z",
+      "updated_at": "2026-08-04T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-233",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-233",
+      "title": "CSV export column order differs from the on-screen report layout",
+      "description": "Columns that were reordered in the report viewer are exported in their original definition order.",
+      "status": "open",
+      "severity": "low",
+      "feature_refs": [
+        "csv-export"
+      ],
+      "introduced_in": "2.1.0",
+      "introduced_in_evidence": "Column reordering in the viewer was added in v2.1.0 without updating the exporter.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Reorder columns in the report definition instead of the viewer.",
+      "created_at": "2026-05-06T09:45:00Z",
+      "updated_at": "2026-09-01T10:00:00Z"
+    },
+    {
+      "id": "bug:BUG-235",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-235",
+      "title": "Token scope picker hides reports:write for organization admins",
+      "description": "Organization admins creating a service token do not see the reports:write scope in the picker, although they are allowed to grant it.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "api-tokens"
+      ],
+      "introduced_in": "2.3.0",
+      "introduced_in_evidence": "Scope picker UI rebuilt in v2.3.0.",
+      "fixed_in": "2.3.1",
+      "fix_evidence": "Scope list now derived from the admin permission set. Listed in the v2.3.1 release notes.",
+      "workaround": "Create the token through POST /v2/tokens with the scope listed explicitly.",
+      "created_at": "2026-07-07T10:25:00Z",
+      "updated_at": "2026-07-14T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-238",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-238",
+      "title": "Large CSV exports time out after 120 seconds",
+      "description": "Exports above roughly 500,000 rows exceed the 120-second gateway timeout and fail with 'Export timed out'. Smaller exports of the same report succeed.",
+      "status": "open",
+      "severity": "medium",
+      "feature_refs": [
+        "csv-export"
+      ],
+      "introduced_in": null,
+      "introduced_in_evidence": null,
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Split the export by date range, or use the asynchronous export API. See KB-014.",
+      "created_at": "2026-07-17T08:30:00Z",
+      "updated_at": "2026-10-31T16:00:00Z"
+    },
+    {
+      "id": "bug:BUG-240",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-240",
+      "title": "SSO users lose their role assignment after nightly SCIM sync",
+      "description": "Users provisioned through SCIM whose IdP group name contains a slash are reassigned to the default Viewer role during the nightly sync.",
+      "status": "fixed",
+      "severity": "high",
+      "feature_refs": [
+        "sso-login",
+        "user-roles"
+      ],
+      "introduced_in": "2.3.1",
+      "introduced_in_evidence": "Group name parser change in v2.3.1.",
+      "fixed_in": "v2.4.0",
+      "fix_evidence": "Group names are now matched verbatim. Listed in the v2.4.0 release notes.",
+      "workaround": "Rename IdP groups to avoid '/' characters.",
+      "created_at": "2026-07-22T07:55:00Z",
+      "updated_at": "2026-09-22T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-242",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-242",
+      "title": "Dashboards render blank in Safari 17",
+      "description": "After the v2.4.0 rendering upgrade, dashboards load an empty canvas in Safari 17. Other browsers are not affected.",
+      "status": "open",
+      "severity": "high",
+      "feature_refs": [
+        "dashboards"
+      ],
+      "introduced_in": "2.4.0",
+      "introduced_in_evidence": "Started with the dashboard rendering upgrade in v2.4.0.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Use a Chromium-based browser or Firefox.",
+      "created_at": "2026-09-24T09:10:00Z",
+      "updated_at": "2026-10-27T15:30:00Z"
+    },
+    {
+      "id": "bug:BUG-244",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-244",
+      "title": "Expired API tokens return 403 Forbidden instead of 401 Unauthorized",
+      "description": "Requests with an expired token receive 403 with error 'insufficient_scope' instead of 401 'token_expired', which misleads integrators into checking scopes.",
+      "status": "open",
+      "severity": "low",
+      "feature_refs": [
+        "public-api",
+        "api-tokens"
+      ],
+      "introduced_in": "2.2.0",
+      "introduced_in_evidence": "Scoped token middleware introduced in v2.2.0.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Check the token expiry date in Settings > API Tokens before investigating scopes. See KB-015.",
+      "created_at": "2026-06-10T13:40:00Z",
+      "updated_at": "2026-09-30T10:00:00Z"
+    },
+    {
+      "id": "bug:BUG-247",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-247",
+      "title": "Webhook retry backoff ignores the receiver's Retry-After header",
+      "description": "When a receiver responds 429 or 503 with Retry-After, the dispatcher still uses its own exponential schedule (1, 5, 15, 45 minutes). Found during code review; no customer impact has been confirmed.",
+      "status": "open",
+      "severity": "medium",
+      "feature_refs": [
+        "webhooks"
+      ],
+      "introduced_in": null,
+      "introduced_in_evidence": null,
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": null,
+      "created_at": "2026-08-14T11:00:00Z",
+      "updated_at": "2026-10-06T09:20:00Z"
+    },
+    {
+      "id": "bug:BUG-249",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-249",
+      "title": "Scheduled reports skip runs for timezones at UTC+13 or UTC+14",
+      "description": "The v2.4.0 timezone engine computes the next run date one day late for UTC+13 and UTC+14 offsets, so daily runs are skipped every other day.",
+      "status": "open",
+      "severity": "medium",
+      "feature_refs": [
+        "scheduled-reports"
+      ],
+      "introduced_in": "2.4.0",
+      "introduced_in_evidence": "Introduced by the scheduled report timezone engine in v2.4.0.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Set the schedule timezone to UTC and adjust the run hour.",
+      "created_at": "2026-09-29T21:05:00Z",
+      "updated_at": "2026-10-22T08:00:00Z"
+    },
+    {
+      "id": "bug:BUG-251",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-251",
+      "title": "X-RateLimit-Reset header reports milliseconds instead of seconds",
+      "description": "The X-RateLimit-Reset header contains milliseconds, so clients that follow it wait 1,000 times longer than necessary.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "api-rate-limits"
+      ],
+      "introduced_in": "2.4.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.4.0.",
+      "fixed_in": "2.4.1",
+      "fix_evidence": "Fix listed in the v2.4.1 release notes.",
+      "workaround": "Divide X-RateLimit-Reset by 1,000 on 2.4.0.",
+      "created_at": "2026-09-23T10:00:00Z",
+      "updated_at": "2026-10-13T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-253",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-253",
+      "title": "Analyst role receives 403 on reports in shared folders",
+      "description": "Users with the Analyst role get 403 Forbidden in the UI and API for reports in shared folders even when they are folder members.",
+      "status": "fixed",
+      "severity": "high",
+      "feature_refs": [
+        "user-roles",
+        "public-api"
+      ],
+      "introduced_in": "2.4.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.4.0.",
+      "fixed_in": "2.4.1",
+      "fix_evidence": "Fix listed in the v2.4.1 release notes.",
+      "workaround": "Temporarily grant the Editor folder role. See KB-034.",
+      "created_at": "2026-09-24T10:00:00Z",
+      "updated_at": "2026-10-13T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-254",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-254",
+      "title": "Dashboard filter dropdown truncates values longer than 40 characters",
+      "description": "Long filter values are cut at 40 characters in the dropdown and values with the same prefix cannot be distinguished.",
+      "status": "open",
+      "severity": "low",
+      "feature_refs": [
+        "dashboards"
+      ],
+      "introduced_in": "2.4.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.4.0.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Type in the dropdown to search. See KB-035.",
+      "created_at": "2026-09-25T10:00:00Z",
+      "updated_at": "2026-11-01T23:00:00Z"
+    },
+    {
+      "id": "bug:BUG-255",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-255",
+      "title": "Scheduled report preview shows the previous run's data",
+      "description": "The preview pane in the schedule editor shows cached results from the last run instead of current data.",
+      "status": "fixed",
+      "severity": "low",
+      "feature_refs": [
+        "scheduled-reports"
+      ],
+      "introduced_in": "2.4.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.4.0.",
+      "fixed_in": "2.4.2",
+      "fix_evidence": "Fix listed in the v2.4.2 release notes.",
+      "workaround": "Open the report itself to preview current data.",
+      "created_at": "2026-09-23T10:00:00Z",
+      "updated_at": "2026-10-27T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-256",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-256",
+      "title": "invoice webhooks omit the occurred_at field",
+      "description": "Payloads for invoice.paid and invoice.voided events are missing occurred_at, so receivers cannot order invoice events.",
+      "status": "fixed",
+      "severity": "medium",
+      "feature_refs": [
+        "webhooks"
+      ],
+      "introduced_in": "2.4.1",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.4.1.",
+      "fixed_in": "2.4.2",
+      "fix_evidence": "Fix listed in the v2.4.2 release notes.",
+      "workaround": "Use the delivery timestamp until upgrading.",
+      "created_at": "2026-10-15T10:00:00Z",
+      "updated_at": "2026-10-27T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-257",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-257",
+      "title": "Dashboards with more than 40 widgets take over 20 seconds to load",
+      "description": "The 2.4.0 rendering engine loads widgets sequentially, so dashboards with more than 40 widgets take over 20 seconds to become interactive.",
+      "status": "fixed",
+      "severity": "high",
+      "feature_refs": [
+        "dashboards"
+      ],
+      "introduced_in": "2.4.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.4.0.",
+      "fixed_in": "2.4.2",
+      "fix_evidence": "Fix listed in the v2.4.2 release notes.",
+      "workaround": "Split large dashboards. See KB-023.",
+      "created_at": "2026-09-25T10:00:00Z",
+      "updated_at": "2026-10-27T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-258",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-258",
+      "title": "Connector sync retries indefinitely on HTTP 401 from the source",
+      "description": "When the source system returns 401, the connector retries every minute instead of pausing and asking for re-authorization.",
+      "status": "open",
+      "severity": "medium",
+      "feature_refs": [
+        "connector-sync"
+      ],
+      "introduced_in": "2.4.1",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.4.1.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Disable and reconnect the connector. See KB-022.",
+      "created_at": "2026-10-14T10:00:00Z",
+      "updated_at": "2026-11-01T23:00:00Z"
+    },
+    {
+      "id": "bug:BUG-259",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-259",
+      "title": "Import rejects DD.MM.YYYY dates although the workspace locale uses them",
+      "description": "Date columns in DD.MM.YYYY format fail validation even when the workspace locale is set to German or Swiss formats.",
+      "status": "open",
+      "severity": "low",
+      "feature_refs": [
+        "data-import"
+      ],
+      "introduced_in": "2.4.1",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.4.1.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Use ISO dates (YYYY-MM-DD). See KB-033.",
+      "created_at": "2026-10-15T10:00:00Z",
+      "updated_at": "2026-11-01T23:00:00Z"
+    },
+    {
+      "id": "bug:BUG-260",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-260",
+      "title": "SCIM deprovisioning leaves API tokens of removed users active",
+      "description": "Users deactivated through SCIM lose UI access, but their personal API tokens keep working until they expire.",
+      "status": "fixed",
+      "severity": "high",
+      "feature_refs": [
+        "sso-login",
+        "api-tokens"
+      ],
+      "introduced_in": "2.4.0",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.4.0.",
+      "fixed_in": "2.4.2",
+      "fix_evidence": "Fix listed in the v2.4.2 release notes.",
+      "workaround": "Revoke tokens of deprovisioned users manually. See KB-030.",
+      "created_at": "2026-09-25T10:00:00Z",
+      "updated_at": "2026-10-27T09:00:00Z"
+    },
+    {
+      "id": "bug:BUG-261",
+      "source_system": "synthetic-issue-tracker",
+      "source_id": "BUG-261",
+      "title": "CSV export file name contains the report ID instead of the report name",
+      "description": "Since 2.4.2, downloaded CSV files are named like report-8f3c2a.csv instead of using the report name.",
+      "status": "open",
+      "severity": "low",
+      "feature_refs": [
+        "csv-export"
+      ],
+      "introduced_in": "2.4.2",
+      "introduced_in_evidence": "Regression traced to changes shipped in v2.4.2.",
+      "fixed_in": null,
+      "fix_evidence": null,
+      "workaround": "Rename the file after download.",
+      "created_at": "2026-10-28T10:00:00Z",
+      "updated_at": "2026-11-01T23:00:00Z"
+    }
+  ]
+}
