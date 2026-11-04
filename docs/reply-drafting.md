@@ -280,6 +280,63 @@ Graph before and after: **458 nodes, 1,060 relationships, 0 `ReplyDraft`**. The 
 - **TCK-1043:** a cautious acknowledgement that points to KB-018 and claims no cause. Two weaknesses: it is `drafted` rather than `insufficientEvidence`, and it signs as "ResolveNest support" (the tool's name) instead of using the product context.
 - **Live approval was not run.** The constraint has since been applied, but calling approve against the shared database was not permitted in this session, and no real draft has been persisted. Approval is verified only by the mocked and rolled-back tests above.
 
+## TCK-1006 preview reliability (Task 4.1, 2026-11-03)
+
+### Observation
+
+Every live reply preview for `ticket:TCK-1006` (the HTTP 403 configuration ticket) failed: three ended in 504 `aiTimeout`, and one diagnostic call is described below. Ask ResolveNest for the same ticket succeeded, as did reply previews for TCK-1046 and TCK-1043.
+
+| Call | Settings | Result |
+|---|---|---|
+| TCK-1006 preview (Task 3, UI) | 45 s provider timeout | 504 `aiTimeout`; no response headers within 45 s |
+| TCK-1006 preview (Task 3, UI retry) | 45 s | 504 `aiTimeout`; no response headers |
+| TCK-1006 preview (Task 4.1, curl) | 45 s | 504 in 45.05 s |
+| TCK-1046 preview, immediately after (control) | 45 s | 200 `drafted` in 4.2 s (6,170 prompt / 571 output tokens) |
+| TCK-1006 preview, diagnostic | **150 s via a temporary `Gemini__TimeoutSeconds` override on the local process; no code or default changed** | Response headers after **85.7 s**; finish reason `STOP`; 6,438 prompt / **539** output tokens; no thought tokens reported. The draft was then rejected: 502 `draftRejected`, `internalMetadataLeak`. |
+
+### What was checked
+
+- **Same code path.** `ReplyDraftService.PreviewAsync` → `EvidenceContextBuilder` → `EvidenceProjector` → `ReplyDraftPrompt` → `GeminiClient.GenerateJsonAsync`, as for every ticket. The system instruction is identical.
+- **Request size and shape** (local diagnostic test `ReplyPreviewPayloadDiagnosticsTests`, which captures the actual request through the fake Gemini handler):
+
+  | Ticket | Request chars | User content | Reply schema | Allowed citations |
+  |---|---|---|---|---|
+  | TCK-1046 | 32,525 | 18,203 | 4,216 | 47 |
+  | TCK-1006 | 34,353 | 18,980 | 4,694 | 52 |
+  | TCK-1043 | 30,156 | 16,188 | 4,156 | 47 |
+  | TCK-1017 | 34,705 | 18,912 | 5,002 | 56 |
+
+  The largest request is 1.16× the smallest. TCK-1006 is not the largest (TCK-1017 is), and its Ask schema (7,072 chars, three citation lists) is larger than its reply schema, yet the Ask call succeeded. Every request uses the same generation config: temperature 0.1, `maxOutputTokens` 4096, one candidate, JSON MIME type, `thinkingLevel` low. Guidance adds about 127 characters.
+- **Evidence content.** Section sizes for TCK-1006 and TCK-1046 are similar: candidate bugs about 8.6k chars each, knowledge articles 4.2k and 4.0k. There is no instruction-like text. The visible differences are that TCK-1006 is `resolved` with a configuration resolution, and its related-ticket total is 80 against 53.
+- **Timeouts are coordinated:**
+  - The provider call is cancelled after `TimeoutSeconds` (45 s) through a linked token.
+  - `HttpClient.Timeout` is that value plus 15 s.
+  - The browser waits 75 s, and the Vite proxy has no timeout of its own.
+  - A client disconnect cancels the provider call and is not reported as a timeout.
+  - There are no retries.
+- **The time is not output length.** Successful calls today produced 134 to 773 output tokens. The diagnostic TCK-1006 call produced 539 tokens in 85.7 s, so latency is not explained by output size or the `maxOutputTokens` limit.
+- **Provider latency varied.** In the same session, successful calls took 4.2 to 38.6 s (most 15 to 25 s, against 2 to 7 s recorded on the earlier verification day), and one TCK-1006 Ask call received a provider HTTP 503 after 21 s. So the provider was slow at times, but the TCK-1046 control call at 4.2 s, immediately next to a 45 s TCK-1006 failure, shows the TCK-1006 delay is not explained by general slowness alone.
+- **Validator.** `internalMetadataLeak` flags BUG keys, other tickets' keys, `rec:`/`rel:` IDs, canonical prefixes and internal relationship or tier names. None of TCK-1006's own text (`insufficient_scope`, `reports:read`, `KB-015`, `/v2/reports`) matches those patterns, so this is not a demonstrated false positive. The rejected text is deliberately never logged or returned, so the exact leaked token is unknown.
+
+### Conclusion
+
+- **No application defect was found.** The request is well formed, of normal size and configuration, the timeouts are coordinated, and the code path is the same as for the tickets that succeed. No code was changed.
+- **The failure is reproducible and specific to this ticket in this task**: 4 of 4 TCK-1006 previews exceeded 45 s, against a 4.2 s TCK-1046 control. The delay happens inside the provider before any response is returned (85.7 s for 539 output tokens). Confidence that this is not transient: moderate to high. Confidence about the internal cause: low. Hidden reasoning, constrained-decoding cost, or difficulty drafting a reply for an already-resolved configuration ticket are all possible, and none can be observed from the API.
+- **Even when generation completes, the output was not acceptable** (`internalMetadataLeak`), so a longer timeout alone would not produce a usable TCK-1006 preview. The validator behaved as designed.
+
+### Not done, and why
+
+- **The default timeout was not raised.** The diagnostic shows a longer wait yields a rejected draft and an 86 s request.
+- **The model was not changed.** No evidence or authorization for that.
+- **No retries were added.** They would multiply slow provider calls.
+- **Evidence was not trimmed.** The request is not oversized, and removing evidence would weaken grounding.
+- **No prompt change for resolved tickets.** It is plausible but unproven, and it would need live A/B calls to justify.
+
+### Follow-up for final QA
+
+- Treat a TCK-1006 reply preview as a known limitation in the demo. The UI already shows "Preview generation took too long … Nothing was saved" with a manual retry, and Ask ResolveNest works for this ticket.
+- If a TCK-1006 draft is required, candidates for a separately authorized experiment are a resolved-ticket instruction in `ReplyDraftPrompt` (for example, a short confirmation or follow-up message), or a different model. Either needs a handful of measured live calls and the existing validation unchanged.
+
 ## Security limitations
 
 - **No authentication or authorization.** Anyone who can reach the API can generate previews (using the Gemini quota) and approve drafts. The preview token is an anti-tampering and binding mechanism, **not** an identity. `approvalBasis` is honestly `unauthenticatedLocalRequest`. Production use needs authentication, per-ticket authorization, audit identity and rate limiting.

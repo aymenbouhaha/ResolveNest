@@ -34,9 +34,9 @@ export function ReplyDraftEvidencePanel({ preview, investigation }: ReplyDraftEv
       className="space-y-4 rounded-xl border border-dashed bg-muted/20 p-4"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <h4 id="reply-evidence-heading" className="text-sm font-semibold text-foreground">
+        <h3 id="reply-evidence-heading" className="text-sm font-semibold text-foreground">
           Information used to prepare this draft
-        </h4>
+        </h3>
         <Badge variant="outline" className="text-muted-foreground">
           Internal · not part of the reply
         </Badge>
@@ -107,10 +107,10 @@ interface PanelBlockProps {
 function PanelBlock({ icon: Icon, title, children }: PanelBlockProps) {
   return (
     <div className="space-y-2">
-      <h5 className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+      <h4 className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
         <Icon className="size-3.5" aria-hidden="true" />
         {title}
-      </h5>
+      </h4>
       {children}
     </div>
   )

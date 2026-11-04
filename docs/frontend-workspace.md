@@ -81,7 +81,7 @@ No query library is used; one hook covers the four requirements.
 
 - Order and classification come from the API. The UI never re-ranks, filters, promotes or demotes. Potential-issue cards show the API's position (`#1 of 6`).
 - Confirmed and potential issues are separate sections. An empty confirmed section says that no confirmed product issue is linked; the potential-issues section says none of its entries is confirmed.
-- Source text (descriptions, resolutions, guide Markdown) is rendered as React text nodes; guide Markdown is shown as preformatted text, never as HTML.
+- Source text (descriptions, resolutions) is rendered as React text nodes. Guide Markdown is rendered through the restricted renderer described in [Task 4.2](#qa-accessibility-and-polish-task-42), never as raw HTML.
 
 ## Product language layer (Task 1.1)
 
@@ -275,7 +275,18 @@ The "outcome unknown" case relies on the server's idempotency. The same token wi
 - Editing: the warning, badge and restore work. Empty, 10-character and `[Customer Name]` texts disable approval with messages. The dialog showed the exact edited text and the no-email notice; Escape closed it without a request.
 - Switching from TCK-1017 to TCK-1043 during a preview aborted it (`net::ERR_ABORTED`), and the new ticket started clean.
 - Approval error mapping for every row above was checked by calling `toApprovalError` in the page with constructed Axios errors.
-- **Not verified:** any live approval (no `approve` request was sent; a click on the dialog's confirm button was blocked by the session's permission policy); the navigation lock and `beforeunload` while approving; the saved summary with a real result; client-side expiry after 30 minutes. 375 px: no horizontal overflow, no console errors.
+- 375 px: no horizontal overflow, no console errors.
+
+### Live approval (Task 3.1, 2026-11-03, authorized by the user)
+
+- `ReplyDraft` count before: 2. Both were earlier manual UI approvals on TCK-1046 by the user. A fresh preview left it at 2.
+- Reviewed and edited TCK-1046 draft ("Kind regards," added, 711 characters). The dialog showed TCK-1046 (Acme Corporation), the exact text, the no-email notice and the edit warning, and was confirmed through the UI.
+- One `approve` request → **201 Created**, `alreadyApproved: false`, draft `reply-draft:4c36c7eea28b430ba0773096e1697a42`, `editedByHuman: true`, `approvedTextValidated: false`, `customerDelivery: notSent`.
+- UI: "Approved draft saved", "No email has been sent", the matching metadata and the approved text. The Approve button is gone and navigation was unlocked afterwards.
+- Neo4j (read-only query): count 3; exactly one `HAS_REPLY_DRAFT` link from `ticket:TCK-1046`; metadata equal to the response. The stored `approvedTextSha256` equals the SHA-256 of the reviewed text computed in the browser.
+- No mail library or mail code exists in the API or web sources; the API log line reads "No message was sent."
+- Duplicate, conflicting, expired, invalid-token, storage-failure and unknown-ticket approvals are covered by the 64 deterministic reply-draft tests (mocked store and rolled-back Neo4j), not by live requests.
+- **Still not verified live:** the navigation lock and `beforeunload` while an approval is in flight (the request completed too quickly to observe), an uncertain outcome against the real server, and client-side expiry after 30 minutes.
 
 ### Known risks
 
@@ -283,9 +294,55 @@ The "outcome unknown" case relies on the server's idempotency. The same token wi
 - The navigation lock covers the sidebar, the mobile Sheet and Refresh. A browser reload or closing the tab during approval only gets the `beforeunload` prompt; the outcome is then unknown to the UI. The draft can still be found in the database by ticket, but there is no UI to read approved drafts (out of scope).
 - There is no approver identity (`approvalBasis: unauthenticatedLocalRequest`), as documented for the backend.
 
+## QA, accessibility and polish (Task 4.2)
+
+### Troubleshooting guide Markdown
+
+`components/GuideMarkdown.tsx` renders guide content with `react-markdown` 10.1 and `remark-gfm` 4.0. GFM is needed because 9 of the 31 guides use tables, including KB-015 for the 403 scenario. No other plugins are used.
+
+Safeguards:
+- `skipHtml` drops every raw HTML node. `rehype-raw` is not used, and `dangerouslySetInnerHTML` is not used anywhere.
+- `allowedElements` lists headings, paragraphs, emphasis, lists, blockquote, code, pre, links, hr, br and table elements; anything else is unwrapped to its text. `img` is not allowed, so no remote content is ever loaded.
+- `urlTransform` keeps only `http:`, `https:` and `mailto:` hrefs. `javascript:` (any case or spacing), `data:`, `vbscript:` and relative URLs become empty, and an empty href renders as plain text.
+- Kept links open with `target="_blank" rel="noopener noreferrer nofollow"`.
+- An error boundary falls back to the plain text if rendering throws.
+- Guide headings map to `h4`–`h6`, so they stay below the card's `h3` in the page outline.
+- The renderer is loaded with `React.lazy` the first time a guide is expanded. It is a 164 KB (49 KB gzip) chunk, and the main bundle stays at about 529 KB (164 KB gzip). This is the only code split.
+
+A hostile-input render in the browser (script tags, `onerror`/`onclick` attributes, an iframe, a remote image, and `javascript:`, `JAVASCRIPT:`, ` javascript:`, `data:`, `vbscript:` and relative links) produced no script, iframe, image or event-handler attribute, executed nothing, and kept only the https and mailto links.
+
+### Fixes from the audit
+
+| Finding | Fix |
+|---|---|
+| Guides showed raw Markdown (`#`, `**`, table pipes) | Restricted renderer above |
+| Guides sat in a two-column grid next to the summary rail: about 294 px of reading width at 1440 px | Single-column guide list (about 664 px) |
+| "Ask ResolveNest", "Customer reply draft" and the three summary-rail titles were `div`s, so they were missing from the heading outline, and "Investigation coverage" (`h3`) nested under the wrong `h2` | Rendered as `h2` with the same styling |
+| Reply evidence panel jumped from `h2` to `h4` | Panel `h3`, blocks `h4` |
+| Every evidence badge was focusable only to show a tooltip: 29 of 66 tab stops on Acme | Badges are no longer focusable; the visible label and icon carry the meaning, the hover tooltip stays, and keyboard and screen-reader users get the definitions as text in "How to read the labels". 41 tab stops remain. |
+| Closing the "Discard your edits?" dialog left focus on `<body>` | Focus returns to "Generate new preview" |
+
+### Checks run (2026-11-04)
+
+- `npm run build` and `npm run lint` pass. No source comments, `dangerouslySetInnerHTML`, `rehype-raw` or browser storage in `src`.
+- **Structure:** every textarea has a label, every button and link has a name, there are no duplicate IDs, every `aria-describedby` target exists, and the landmarks are `header`, `main`, and `nav` "Primary" and "Breadcrumb".
+- **Contrast** (computed from the theme tokens): muted text 6.9–7.6:1; badge text on its surface: confirmed 5.1, documented 5.5, candidate 4.9, context 6.9; primary button 6.2; destructive on card 4.8. All pass WCAG AA (4.5:1).
+- **Focus:** each of the 41 tab stops shows an outline or ring when focused. The first Tab reaches the visible "Skip to investigation" link.
+- **Overflow:** none at 375 px and 768 px for all four tickets with every accordion expanded. At 375 px the reply editor is 311 px wide. The approval dialog fits inside the viewport (x 25–351, y 133–679 of 375×812), its buttons stack, the text box scrolls at 228 px, and focus starts on "Keep reviewing".
+- **Unchanged evidence:** TCK-1046 still shows no confirmed issue and BUG-231 as Possible #1. No classification, order or wording logic changed.
+- **Console:** no console errors or warnings while switching all four tickets.
+- **Gemini:** one call (a TCK-1046 preview) to measure the mobile dialog. No approval was sent, and no record was created.
+
+### Not verified in this session
+
+- Focus restoration after the approval or discard dialog closes. The browser pane was hidden, so the exit animation never completed and Radix did not finish closing. Closing worked visibly in Task 3, and the focus-return code is the same pattern for both dialogs.
+- Screen-reader output (no screen reader was run), automated axe-style testing (not installed, per the task constraints), and visual screenshots after the guide change at 768 px.
+- At 32 px, button heights meet WCAG 2.2 AA's 24 px minimum target size, but not the 44 px often recommended for touch.
+
 ## Known limitations
 
 - The selected ticket is not in the URL, so a reload returns to Acme.
 - Only the four demo tickets are selectable; there is no ticket search API.
-- The main bundle is about 527 KB (164 KB gzip), with no code splitting.
+- The main bundle is about 529 KB (164 KB gzip). The only split chunk is the guide Markdown renderer (164 KB, 49 KB gzip), loaded on first expand.
+- `npm audit` lists `deepmerge` and `minimatch` advisories through the `shadcn` CLI package, a runtime dependency because `index.css` imports `shadcn/tailwind.css`. They are not in the browser bundle, and the new Markdown packages add none.
 - `npm audit` reports a moderate `minimatch` advisory through the existing ESLint toolchain (dev only), unrelated to the packages added here.

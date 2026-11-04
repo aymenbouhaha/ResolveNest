@@ -1,5 +1,5 @@
 import { CircleAlert, ListChecks, Scale } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { EVIDENCE_CLASSIFICATION_LABELS } from '../lib/evidenceLabels'
 import {
   collectInvestigationLimitations,
@@ -34,10 +34,10 @@ export function InvestigationSummary({ investigation }: InvestigationSummaryProp
     <div className="space-y-4">
       <Card size="sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+          <h2 data-slot="card-title" className="flex items-center gap-2 font-heading leading-snug text-sm font-semibold">
             <ListChecks className="size-4 text-primary" aria-hidden="true" />
             At a glance
-          </CardTitle>
+          </h2>
         </CardHeader>
         <CardContent>
           <ul className="grid grid-cols-2 gap-2">
@@ -58,10 +58,10 @@ export function InvestigationSummary({ investigation }: InvestigationSummaryProp
 
       <Card size="sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+          <h2 data-slot="card-title" className="flex items-center gap-2 font-heading leading-snug text-sm font-semibold">
             <CircleAlert className="size-4 text-evidence-candidate" aria-hidden="true" />
             What remains uncertain
-          </CardTitle>
+          </h2>
         </CardHeader>
         <CardContent className="space-y-4">
           {uncertainties.length > 0 ? (
@@ -84,10 +84,10 @@ export function InvestigationSummary({ investigation }: InvestigationSummaryProp
 
       <Card size="sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+          <h2 data-slot="card-title" className="flex items-center gap-2 font-heading leading-snug text-sm font-semibold">
             <Scale className="size-4 text-primary" aria-hidden="true" />
             How to read the labels
-          </CardTitle>
+          </h2>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2.5">

@@ -1,7 +1,7 @@
 import { CircleX, Loader2, Sparkles, X } from 'lucide-react'
 import { useId, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { useInvestigationAsk } from '../../hooks/useInvestigationAsk'
@@ -54,10 +54,10 @@ export function AskResolveNestSection({ investigation }: AskResolveNestSectionPr
     <section id="ask-resolvenest" aria-labelledby="ask-resolvenest-heading" className="scroll-mt-20">
       <Card className="gap-0 py-0">
         <CardHeader className="gap-1 border-b py-4">
-          <CardTitle id="ask-resolvenest-heading" className="flex items-center gap-2 text-base font-semibold">
+          <h2 id="ask-resolvenest-heading" data-slot="card-title" className="flex items-center gap-2 font-heading leading-snug text-base font-semibold">
             <Sparkles className="size-4 text-primary" aria-hidden="true" />
             Ask ResolveNest
-          </CardTitle>
+          </h2>
           <CardDescription>
             Ask a question about this ticket. The AI assistant answers from this ticket's records and
             cites them; review its answer before relying on it.

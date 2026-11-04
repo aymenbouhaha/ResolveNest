@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
@@ -71,6 +71,7 @@ export function ReplyDraftSection({ investigation }: ReplyDraftSectionProps) {
   const [textAwaitingConfirmation, setTextAwaitingConfirmation] = useState<string | null>(null)
   const [isDiscardDialogOpen, setDiscardDialogOpen] = useState(false)
   const approveButtonRef = useRef<HTMLButtonElement>(null)
+  const newPreviewButtonRef = useRef<HTMLButtonElement>(null)
   const guidanceFieldId = useId()
   const guidanceHintId = useId()
   const now = useCurrentTime()
@@ -116,10 +117,10 @@ export function ReplyDraftSection({ investigation }: ReplyDraftSectionProps) {
     <section id="customer-reply-draft" aria-labelledby="customer-reply-draft-heading" className="scroll-mt-20">
       <Card className="gap-0 py-0">
         <CardHeader className="gap-1 border-b py-4">
-          <CardTitle id="customer-reply-draft-heading" className="flex items-center gap-2 text-base font-semibold">
+          <h2 id="customer-reply-draft-heading" data-slot="card-title" className="flex items-center gap-2 font-heading leading-snug text-base font-semibold">
             <FileText className="size-4 text-primary" aria-hidden="true" />
             Customer reply draft
-          </CardTitle>
+          </h2>
           <CardDescription>
             Generate a suggested reply, review and edit it, then approve it to save it as the approved
             draft for this ticket. ResolveNest never sends email.
@@ -235,7 +236,13 @@ export function ReplyDraftSection({ investigation }: ReplyDraftSectionProps) {
                   {isApproving ? <Loader2 className="animate-spin" aria-hidden="true" /> : <ShieldCheck aria-hidden="true" />}
                   {isApproving ? 'Saving' : 'Approve & save'}
                 </Button>
-                <Button type="button" variant="outline" disabled={isApproving} onClick={requestNewPreview}>
+                <Button
+                  ref={newPreviewButtonRef}
+                  type="button"
+                  variant="outline"
+                  disabled={isApproving}
+                  onClick={requestNewPreview}
+                >
                   <RefreshCw aria-hidden="true" />
                   Generate new preview
                 </Button>
@@ -273,7 +280,14 @@ export function ReplyDraftSection({ investigation }: ReplyDraftSectionProps) {
       />
 
       <AlertDialog open={isDiscardDialogOpen} onOpenChange={setDiscardDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent
+          onCloseAutoFocus={(event) => {
+            if (newPreviewButtonRef.current?.isConnected && !newPreviewButtonRef.current.disabled) {
+              event.preventDefault()
+              newPreviewButtonRef.current.focus()
+            }
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>Discard your edits?</AlertDialogTitle>
             <AlertDialogDescription>

@@ -17,12 +17,7 @@ export function EvidenceBadge({ evidence, className }: EvidenceBadgeProps) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Badge
-          variant="outline"
-          tabIndex={0}
-          aria-label={`${label}: ${description}`}
-          className={cn(evidenceClassName, className)}
-        >
+        <Badge variant="outline" className={cn(evidenceClassName, className)}>
           <Icon aria-hidden="true" />
           {label}
         </Badge>

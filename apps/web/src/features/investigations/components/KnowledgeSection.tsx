@@ -1,4 +1,5 @@
 import { BookOpen, CornerDownRight } from 'lucide-react'
+import { lazy, Suspense } from 'react'
 import {
   Accordion,
   AccordionContent,
@@ -18,6 +19,10 @@ import type {
 import { EmptyEvidence, EvidenceSection } from './EvidenceSection'
 import { EvidenceBadge } from './EvidenceBadge'
 
+const GuideMarkdown = lazy(() =>
+  import('./GuideMarkdown').then((module) => ({ default: module.GuideMarkdown })),
+)
+
 interface KnowledgeSectionProps {
   articles: KnowledgeArticleEvidence[]
   features: TicketFeature[]
@@ -33,7 +38,7 @@ export function KnowledgeSection({ articles, features }: KnowledgeSectionProps) 
       meta={articles.length > 0 ? pluralize(articles.length, 'guide') : null}
     >
       {articles.length > 0 ? (
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid gap-3">
           {articles.map((article) => (
             <KnowledgeArticleCard key={article.id} article={article} features={features} />
           ))}
@@ -83,9 +88,21 @@ function KnowledgeArticleCard({ article, features }: KnowledgeArticleCardProps) 
             <AccordionItem value="content">
               <AccordionTrigger>Read full guide</AccordionTrigger>
               <AccordionContent>
-                <pre className="max-h-80 overflow-y-auto rounded-md bg-muted/50 p-3 font-sans text-xs leading-relaxed whitespace-pre-wrap break-words">
-                  {article.content}
-                </pre>
+                <div
+                  tabIndex={0}
+                  aria-label={`${formatReference(article.id)} guide content`}
+                  className="max-h-96 overflow-y-auto rounded-md bg-muted/40 px-3 py-1 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                >
+                  <Suspense
+                    fallback={
+                      <p role="status" className="py-2 text-xs text-muted-foreground">
+                        Loading guide…
+                      </p>
+                    }
+                  >
+                    <GuideMarkdown content={article.content} />
+                  </Suspense>
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
