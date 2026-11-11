@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="400" viewBox="0 0 1120 400" role="img" aria-labelledby="title desc">
+  <title id="title">Investigation traversal paths</title>
+  <desc id="desc">A selected ticket connects to a feature through ABOUT_FEATURE. A candidate bug points to that feature through AFFECTS. A confirmed bug can connect the selected ticket to another ticket through CONFIRMED_AS, and a customer points to that other ticket through REPORTED.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#475569"/></marker>
+    <style>text{font-family:Arial,sans-serif;fill:#0f172a}.node{fill:#eff6ff;stroke:#2563eb;stroke-width:2}.edge{fill:none;stroke:#475569;stroke-width:2;marker-end:url(#arrow)}.label{font-size:12px;font-weight:700}.name{font-size:17px;font-weight:700}.detail{font-size:13px;fill:#475569}</style>
+  </defs>
+  <rect width="1120" height="400" rx="16" fill="#fff"/>
+  <text x="35" y="40" font-size="25" font-weight="700">How graph evidence connects</text>
+  <text x="35" y="80" class="detail">Candidate discovery · shared feature does not establish a confirmed cause</text>
+  <path class="edge" d="M235 155H455"/><text x="276" y="140" class="label">ABOUT_FEATURE</text>
+  <path class="edge" d="M875 155H655"/><text x="742" y="140" class="label">AFFECTS</text>
+  <rect class="node" x="35" y="115" width="200" height="80" rx="12"/><text x="135" y="147" text-anchor="middle" class="name">SupportTicket</text><text x="135" y="172" text-anchor="middle" class="detail">Selected ticket</text>
+  <rect class="node" x="455" y="115" width="200" height="80" rx="12"/><text x="555" y="147" text-anchor="middle" class="name">Feature</text><text x="555" y="172" text-anchor="middle" class="detail">Shared capability</text>
+  <rect class="node" x="875" y="115" width="200" height="80" rx="12"/><text x="975" y="147" text-anchor="middle" class="name">Bug</text><text x="975" y="172" text-anchor="middle" class="detail">Candidate for this ticket</text>
+  <text x="35" y="244" class="detail">Confirmed linkage · follow explicit confirmations to other customers' reports</text>
+  <path class="edge" d="M235 320H315"/><text x="238" y="272" class="label">CONFIRMED_AS</text>
+  <path class="edge" d="M595 320H515"/><text x="519" y="272" class="label">CONFIRMED_AS</text>
+  <path class="edge" d="M875 320H795"/><text x="802" y="272" class="label">REPORTED</text>
+  <rect class="node" x="35" y="280" width="200" height="80" rx="12"/><text x="135" y="312" text-anchor="middle" class="name">SupportTicket</text><text x="135" y="337" text-anchor="middle" class="detail">Selected, if confirmed</text>
+  <rect class="node" x="315" y="280" width="200" height="80" rx="12"/><text x="415" y="312" text-anchor="middle" class="name">Bug</text><text x="415" y="337" text-anchor="middle" class="detail">Shared confirmed defect</text>
+  <rect class="node" x="595" y="280" width="200" height="80" rx="12"/><text x="695" y="312" text-anchor="middle" class="name">SupportTicket</text><text x="695" y="337" text-anchor="middle" class="detail">Another confirmed case</text>
+  <rect class="node" x="875" y="280" width="200" height="80" rx="12"/><text x="975" y="312" text-anchor="middle" class="name">Customer</text><text x="975" y="337" text-anchor="middle" class="detail">Other reporting customer</text>
+</svg>

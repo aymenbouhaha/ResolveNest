@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="660" viewBox="0 0 1120 660" role="img" aria-labelledby="title desc">
+  <title id="title">ResolveNest knowledge graph schema</title>
+  <desc id="desc">Seven node labels connected by nine directed relationships. Customers report tickets. Tickets concern features, can be confirmed as bugs, and have approved reply drafts. Bugs affect features and link to introduction and fix releases. Knowledge articles address bugs and cover features.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#475569"/></marker>
+    <style>text{font-family:Arial,sans-serif;fill:#0f172a}.node{fill:#eff6ff;stroke:#2563eb;stroke-width:2}.edge{fill:none;stroke:#475569;stroke-width:2;marker-end:url(#arrow)}.label{font-size:13px;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:8;stroke-linejoin:round}.name{font-size:19px;font-weight:700}.detail{font-size:13px;fill:#475569}</style>
+  </defs>
+  <rect width="1120" height="660" rx="16" fill="#fff"/>
+  <text x="40" y="42" font-size="25" font-weight="700">ResolveNest · Neo4j schema</text>
+  <text x="40" y="68" class="detail">Stored node labels and directed relationships</text>
+  <path class="edge" d="M230 150H350"/><text x="250" y="138" class="label">REPORTED</text>
+  <path class="edge" d="M550 150H790"/><text x="605" y="138" class="label">ABOUT_FEATURE</text>
+  <path class="edge" d="M450 195V330"/><text x="465" y="266" class="label">CONFIRMED_AS</text>
+  <path class="edge" d="M550 365H890V195"/><text x="693" y="352" class="label">AFFECTS</text>
+  <path class="edge" d="M230 375H350"/><text x="242" y="360" class="label">ADDRESSES</text>
+  <path class="edge" d="M30 375H15V90H890V105"/><text x="640" y="94" class="label">COVERS</text>
+  <path class="edge" d="M400 420V535"/><text x="262" y="482" class="label">INTRODUCED_IN</text>
+  <path class="edge" d="M500 420V535"/><text x="515" y="510" class="label">FIXED_IN</text>
+  <path class="edge" d="M550 180H1050V535H980"/><text x="1066" y="390" transform="rotate(-90 1066 390)" class="label">HAS_REPLY_DRAFT</text>
+  <rect class="node" x="30" y="330" width="200" height="90" rx="14"/><text x="130" y="368" text-anchor="middle" class="name">KnowledgeArticle</text><text x="130" y="395" text-anchor="middle" class="detail">Guides and workarounds</text>
+  <rect class="node" x="350" y="105" width="200" height="90" rx="14"/><text x="450" y="143" text-anchor="middle" class="name">SupportTicket</text><text x="450" y="170" text-anchor="middle" class="detail">Customer issue</text>
+  <rect class="node" x="790" y="105" width="200" height="90" rx="14"/><text x="890" y="143" text-anchor="middle" class="name">Feature</text><text x="890" y="170" text-anchor="middle" class="detail">Product capability</text>
+  <rect class="node" x="350" y="330" width="200" height="90" rx="14"/><text x="450" y="368" text-anchor="middle" class="name">Bug</text><text x="450" y="395" text-anchor="middle" class="detail">Tracked defect</text>
+  <rect class="node" x="350" y="535" width="200" height="90" rx="14"/><text x="450" y="573" text-anchor="middle" class="name">Release</text><text x="450" y="600" text-anchor="middle" class="detail">Published version</text>
+  <rect class="node" x="780" y="535" width="200" height="90" rx="14"/><text x="880" y="573" text-anchor="middle" class="name">ReplyDraft</text><text x="880" y="600" text-anchor="middle" class="detail">Human-approved reply</text>
+  <rect class="node" x="30" y="105" width="200" height="90" rx="14"/><text x="130" y="143" text-anchor="middle" class="name">Customer</text><text x="130" y="170" text-anchor="middle" class="detail">Reporting organization</text>
+</svg>
