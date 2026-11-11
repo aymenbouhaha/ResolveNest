@@ -1,14 +1,20 @@
 import { Database, LayoutDashboard, Ticket, Waypoints } from 'lucide-react'
+import { useId } from 'react'
 import { cn } from '@/lib/utils'
-import { DEMO_TICKETS, shortTicketId } from '@/features/investigations/demoTickets'
+import { shortTicketId } from '@/features/tickets/ticketsApi'
+import type { TicketList } from '@/features/tickets/useTickets'
+import { Button } from '@/components/ui/button'
 
 interface AppSidebarProps {
-  selectedTicketId: string
+  selectedTicketId: string | null
+  tickets: TicketList
   onSelectTicket: (ticketId: string) => void
   isNavigationLocked: boolean
 }
 
-export function AppSidebar({ selectedTicketId, onSelectTicket, isNavigationLocked }: AppSidebarProps) {
+export function AppSidebar({ selectedTicketId, onSelectTicket, isNavigationLocked, tickets }: AppSidebarProps) {
+  const searchId = useId()
+  const ticketsLabelId = useId()
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex h-16 items-center gap-2.5 border-b border-sidebar-border px-5">
@@ -36,17 +42,31 @@ export function AppSidebar({ selectedTicketId, onSelectTicket, isNavigationLocke
         </div>
 
         <div className="space-y-1">
-          <p id="demo-tickets-label" className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-            Demo investigations
+          <p id={ticketsLabelId} className="px-2 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            Tickets
           </p>
-          <ul aria-labelledby="demo-tickets-label" className="space-y-1">
-            {DEMO_TICKETS.map((demoTicket) => {
-              const isActive = demoTicket.ticketId === selectedTicketId
+          <form className="space-y-2 px-2 py-2" onSubmit={(event) => {
+            event.preventDefault()
+            if (!isNavigationLocked) tickets.search(tickets.searchText)
+          }}>
+            <label className="sr-only" htmlFor={searchId}>Search ticket ID or subject</label>
+            <input id={searchId} name="q" type="search" value={tickets.searchText} onChange={(event) => tickets.setSearchText(event.target.value)} placeholder="Search ID or subject" disabled={isNavigationLocked} className="w-full rounded-md border bg-background px-2 py-2 text-sm" />
+            <div className="flex gap-2">
+              <Button type="submit" size="sm" variant="outline" disabled={isNavigationLocked}>Search</Button>
+              <Button type="button" size="sm" variant="ghost" onClick={tickets.reload} disabled={isNavigationLocked || tickets.state.status === 'loading'}>Refresh</Button>
+            </div>
+          </form>
+          {tickets.state.status === 'loading' ? <p role="status" className="px-2 text-sm text-muted-foreground">Loading tickets…</p> : null}
+          {tickets.state.status === 'error' ? <div role="alert" className="space-y-2 px-2 text-sm"><p>Tickets could not be loaded.</p><Button variant="outline" size="sm" onClick={tickets.reload} disabled={isNavigationLocked}>Retry</Button></div> : null}
+          {tickets.state.status === 'success' && tickets.state.data.items.length === 0 ? <p role="status" className="px-2 text-sm text-muted-foreground">No tickets found.</p> : null}
+          <ul aria-labelledby={ticketsLabelId} className="space-y-1">
+            {(tickets.state.status === 'success' ? tickets.state.data.items : []).map((ticket) => {
+              const isActive = ticket.id === selectedTicketId
               return (
-                <li key={demoTicket.ticketId}>
+                <li key={ticket.id}>
                   <button
                     type="button"
-                    onClick={() => onSelectTicket(demoTicket.ticketId)}
+                    onClick={() => onSelectTicket(ticket.id)}
                     aria-current={isActive ? 'true' : undefined}
                     disabled={isNavigationLocked && !isActive}
                     title={isNavigationLocked && !isActive ? 'Wait until the approved draft is saved' : undefined}
@@ -64,7 +84,7 @@ export function AppSidebar({ selectedTicketId, onSelectTicket, isNavigationLocke
                     />
                     <span className="min-w-0">
                       <span className="block font-mono text-xs text-muted-foreground">
-                        {shortTicketId(demoTicket.ticketId)}
+                        {ticket.sourceId ?? shortTicketId(ticket.id)}
                       </span>
                       <span
                         className={cn(
@@ -72,10 +92,10 @@ export function AppSidebar({ selectedTicketId, onSelectTicket, isNavigationLocke
                           isActive ? 'font-medium text-foreground' : 'text-sidebar-foreground',
                         )}
                       >
-                        {demoTicket.label}
+                        {ticket.subject ?? 'Untitled ticket'}
                       </span>
                       <span className="block truncate text-xs text-muted-foreground">
-                        {demoTicket.scenario}
+                        {[ticket.customer?.name, ticket.status].filter(Boolean).join(' · ')}
                       </span>
                     </span>
                   </button>
@@ -83,6 +103,13 @@ export function AppSidebar({ selectedTicketId, onSelectTicket, isNavigationLocke
               )
             })}
           </ul>
+          {tickets.state.status === 'success' ? <div className="space-y-2 px-2 py-3">
+            <p role="status" className="text-xs text-muted-foreground">Page {tickets.query.page} · {tickets.state.data.totalCount} tickets</p>
+            <nav aria-label="Ticket pages" className="flex gap-2">
+              <Button size="sm" variant="outline" disabled={isNavigationLocked || tickets.query.page <= 1} onClick={() => tickets.setPage(tickets.query.page - 1)}>Previous</Button>
+              <Button size="sm" variant="outline" disabled={isNavigationLocked || tickets.query.page * tickets.state.data.pageSize >= tickets.state.data.totalCount} onClick={() => tickets.setPage(tickets.query.page + 1)}>Next</Button>
+            </nav>
+          </div> : null}
         </div>
       </nav>
 

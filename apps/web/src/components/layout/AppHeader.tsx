@@ -1,10 +1,10 @@
 import { FlaskConical, Menu } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { shortTicketId } from '@/features/investigations/demoTickets'
+import { shortTicketId } from '@/features/tickets/ticketsApi'
 
 interface AppHeaderProps {
-  selectedTicketId: string
+  selectedTicketId: string | null
   onOpenNavigation: () => void
 }
 
@@ -28,7 +28,7 @@ export function AppHeader({ selectedTicketId, onOpenNavigation }: AppHeaderProps
               /
             </li>
             <li aria-current="page" className="truncate font-mono font-medium text-foreground">
-              {shortTicketId(selectedTicketId)}
+              {selectedTicketId ? shortTicketId(selectedTicketId) : 'Tickets'}
             </li>
           </ol>
         </nav>

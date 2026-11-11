@@ -17,10 +17,10 @@ import type { TicketInvestigation } from './types/investigation'
 
 interface InvestigationWorkspaceProps {
   ticketId: string
-  scenarioLabel: string | null
+  subject: string | null
 }
 
-export function InvestigationWorkspace({ ticketId, scenarioLabel }: InvestigationWorkspaceProps) {
+export function InvestigationWorkspace({ ticketId, subject }: InvestigationWorkspaceProps) {
   const { state, reload } = useInvestigation(ticketId)
   const isLoading = state.status === 'loading'
   const { isLocked: isNavigationLocked } = useNavigationLock()
@@ -34,7 +34,7 @@ export function InvestigationWorkspace({ ticketId, scenarioLabel }: Investigatio
           </p>
           <p className="truncate text-sm text-foreground">
             <span className="font-mono">{formatReference(ticketId)}</span>
-            {scenarioLabel ? <span className="text-muted-foreground"> · {scenarioLabel}</span> : null}
+            {subject ? <span className="text-muted-foreground"> · {subject}</span> : null}
           </p>
         </div>
         <Button variant="outline" onClick={reload} disabled={isLoading || isNavigationLocked}>

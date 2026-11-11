@@ -2,9 +2,11 @@ import { useState, type ReactNode } from 'react'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { AppHeader } from './AppHeader'
 import { AppSidebar } from './AppSidebar'
+import type { TicketList } from '@/features/tickets/useTickets'
 
 interface AppShellProps {
-  selectedTicketId: string
+  selectedTicketId: string | null
+  tickets: TicketList
   onSelectTicket: (ticketId: string) => void
   isNavigationLocked: boolean
   children: ReactNode
@@ -15,6 +17,7 @@ export function AppShell({
   onSelectTicket,
   isNavigationLocked,
   children,
+  tickets,
 }: AppShellProps) {
   const [isNavigationOpen, setNavigationOpen] = useState(false)
 
@@ -34,6 +37,7 @@ export function AppShell({
 
       <aside className="fixed inset-y-0 left-0 hidden w-72 border-r border-sidebar-border lg:block">
         <AppSidebar
+          tickets={tickets}
           selectedTicketId={selectedTicketId}
           onSelectTicket={onSelectTicket}
           isNavigationLocked={isNavigationLocked}
@@ -43,8 +47,9 @@ export function AppShell({
       <Sheet open={isNavigationOpen} onOpenChange={setNavigationOpen}>
         <SheetContent side="left" className="w-72 gap-0 p-0">
           <SheetTitle className="sr-only">Navigation</SheetTitle>
-          <SheetDescription className="sr-only">Choose a demo investigation</SheetDescription>
+          <SheetDescription className="sr-only">Choose a ticket to investigate</SheetDescription>
           <AppSidebar
+            tickets={tickets}
             selectedTicketId={selectedTicketId}
             onSelectTicket={selectTicketAndCloseNavigation}
             isNavigationLocked={isNavigationLocked}

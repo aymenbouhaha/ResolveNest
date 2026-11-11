@@ -1,4 +1,5 @@
 using Neo4j.Driver;
+using ResolveNest.Api.Features.Tickets;
 using ResolveNest.Api.Features.AiInvestigations;
 using ResolveNest.Api.Features.Ingestion;
 using ResolveNest.Api.Features.Investigations;
@@ -27,6 +28,7 @@ builder.Services.AddSingleton<IDriver>(_ =>
 
 builder.Services.AddIngestion(builder.Configuration);
 builder.Services.AddInvestigations();
+builder.Services.AddTickets();
 builder.Services.AddAiInvestigations(builder.Configuration);
 builder.Services.AddReplyDrafts();
 
@@ -76,6 +78,7 @@ app.MapGet("/api/health/db", async (
 });
 
 app.MapInvestigations();
+app.MapTickets();
 app.MapAiInvestigations();
 app.MapReplyDrafts();
 
